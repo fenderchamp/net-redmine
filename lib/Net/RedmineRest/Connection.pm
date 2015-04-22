@@ -1,27 +1,26 @@
-package Net::Redmine::Connection;
-use Any::Moose;
+package Net::RedmineRest::Connection;
+use Moo;
 use URI;
 use Params::Validate;
 
-has url      => ( is => "rw", isa => "Str", required => 1 );
-has user     => ( is => "rw", isa => "Str", required => 1 );
-has password => ( is => "rw", isa => "Str", required => 1 );
+has url      => ( is => "rw",  required => 1 );
+has user     => ( is => "rw",  required => 1 );
+has password => ( is => "rw",  required => 1 );
 
-has is_logined => ( is => "rw", isa => "Int");
+has is_logined => ( is => "rw");
 
 has _live_ticket_objects => (
-    is => "rw",
-    isa => "HashRef",
-    default => sub { {} }
+    is => "rw"
 );
 
 has mechanize => (
     is => "rw",
-    isa => "WWW::Mechanize",
-    lazy_build => 1,
+    lazy => 1,
+    builder => 1,
 );
 
 use WWW::Mechanize;
+use REST::Client;
 
 sub _build_mechanize {
     my ($self) = @_;
@@ -76,13 +75,25 @@ sub assert_login {
 sub get_project_overview {
     my ($self) = @_;
     $self->assert_login;
+    my $client = REST::Client->new();
+    $client->GET(
+      $self->url . '/projects/test9876.xml'  
+    );
+    $DB::single=1;
+
+    $client->GET(
+      $self->url . '/projects/asfdlkjasdfkl.xml'  
+    );
+
     $self->mechanize->get( $self->url );
     return $self;
 }
 
 sub get_issues_page {
     my ($self, $id) = @_;
-    $self->get_project_overview;
+$DB::single=1;
+    $self->get_project_overview();
+      
     my $mech = $self->mechanize;
 
     if ($id) {
@@ -100,6 +111,7 @@ sub get_issues_page {
 
 sub get_new_issue_page {
     my ($self) = @_;
+
 
     my $mech = $self->get_project_overview->mechanize;
 
@@ -137,26 +149,25 @@ sub get_user_page {
 }
 
 __PACKAGE__->meta->make_immutable;
-no Any::Moose;
 1;
 
 __END__
 
 =head1 NAME
 
-Net::Redmine::Connection
+Net::RedmineRest::Connection
 
 =head1 SYNOPSIS
 
     # Initialize a redmine connection object
-    my $redmine = Net::Redmine::Connection->new(
+    my $redmine = Net::RedmineRest::Connection->new(
         url => 'http://redmine.example.com/projects/show/fooproject'
         user => 'hiro',
         password => 'yatta'
     );
 
     # Passed it to other classes
-    my $ticket = Net::Redmine::Ticket->new(connection => $redmine);
+    my $ticket = Net::RedmineRest::Ticket->new(connection => $redmine);
 
 =head1 DESCRIPTION
 

@@ -1,9 +1,9 @@
 #!/usr/bin/env perl -w
 use strict;
 use Test::Cukes;
-use Net::Redmine;
+use Net::RedmineRest;
 use URI;
-require 't/net_redmine_test.pl';
+require 't/net_redmine_rest_test.pl';
 
 my ($r, $c);
 
@@ -11,7 +11,7 @@ Given qr/an redmine object/ => sub {
     $r = new_net_redmine();
     $c = $r->connection;
 
-    assert $c->isa("Net::Redmine::Connection");
+    assert $c->isa("Net::RedmineRest::Connection");
 };
 
 When qr/invoke the "(.*)" method/ => sub {
@@ -28,6 +28,7 @@ Then qr/it should be on the login page/ => sub {
 
 Then qr/it should be signed in/ => sub {
     $c->get_project_overview;
+    my $links = $c->mechanize->links();
     my $link = $c->mechanize->find_link( url_regex => qr[/my/page] );
     assert $link;
 };
@@ -37,8 +38,8 @@ feature(<DATA>);
 runtests;
 
 __END__
-Feature: Net::Redmine::Connection class
-  Describe the features provided by Net::Redmine::Connection class
+Feature: Net::RedmineRest::Connection class
+  Describe the features provided by Net::RedmineRest::Connection class
 
   Scenario: test the get_login_page method
     Given an redmine object

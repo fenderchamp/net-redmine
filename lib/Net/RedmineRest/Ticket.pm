@@ -1,37 +1,39 @@
-package Net::Redmine::Ticket;
-use Any::Moose;
-use Net::Redmine::TicketHistory;
-use Net::Redmine::User;
+package Net::RedmineRest::Ticket;
+use Moo;
+use Net::RedmineRest::TicketHistory;
+use Net::RedmineRest::User;
 use DateTimeX::Easy;
+use REST::Client;
 
 has connection => (
     is => "rw",
-    isa => "Net::Redmine::Connection",
     required => 1,
     weak_ref => 1,
 );
 
-has id          => (is => "rw", isa => "Int");
-has subject     => (is => "rw", isa => "Str");
-has description => (is => "rw", isa => "Str");
-has status      => (is => "rw", isa => "Str");
-has priority    => (is => "rw", isa => "Str");
-has author      => (is => "rw", isa => "Maybe[Net::Redmine::User]");
-has created_at  => (is => "rw", isa => "DateTime");
-has note        => (is => "rw", isa => "Str");
-has histories   => (is => "rw", isa => "ArrayRef", lazy_build => 1);
+has id          => (is => "rw");
+has subject     => (is => "rw");
+has description => (is => "rw");
+has status      => (is => "rw");
+has priority    => (is => "rw");
+has author      => (is => "rw");
+has created_at  => (is => "rw");
+has note        => (is => "rw");
+has histories   => (is => "rw", lazy=>1, builder => 1);
 
 sub create {
     my ($class, %attr) = @_;
 
     my $self = $class->new(%attr);
+$DB::single=1;
+    my $c=$self->connection;
+    $c->get_project_overview();
 
     my $mech = $self->connection->get_new_issue_page()->mechanize;
 
     $mech->form_id("issue-form");
     $mech->field("issue[subject]" => $self->subject);
     $mech->field("issue[description]" => $self->description);
-$DB::single=1;
     $mech->submit;
 
     unless ($mech->response->is_success) {
@@ -89,7 +91,7 @@ $DB::single=1;
 
     my $author_page_uri = $p->find(".issue .author a")->get(0)->getAttribute("href");
     if ($author_page_uri =~ m[/(?:account/show|users)/(\d+)$]) {
-        $self->author(Net::Redmine::User->load(id => $1, connection => $self->connection));
+        $self->author(Net::RedmineRest::User->load(id => $1, connection => $self->connection));
     }
 
     return $self;
@@ -162,7 +164,7 @@ sub _build_histories {
 
     return [
         map {
-            Net::Redmine::TicketHistory->new(
+            Net::RedmineRest::TicketHistory->new(
                 connection => $self->connection,
                 id => $_,
                 ticket_id => $self->id
@@ -172,14 +174,13 @@ sub _build_histories {
 }
 
 __PACKAGE__->meta->make_immutable;
-no Any::Moose;
 1;
 
 __END__
 
 =head1 NAME
 
-Net::Redmine::Ticket - Represents a ticket.
+Net::RedmineRest::Ticket - Represents a ticket.
 
 =head1 SYNOPSIS
 

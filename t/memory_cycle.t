@@ -10,6 +10,7 @@ my $r = new_net_redmine();
 
 plan tests => 4;
 
+$DB::single=1;
 my $t1 = $r->create(
     ticket => {
         subject => __FILE__ . " $$ @{[time]}",
