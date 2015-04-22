@@ -14,11 +14,12 @@ has connection => (
 sub BUILDARGS {
     my $class = shift;
     my %args = @_;
-
     $args{connection} = Net::RedmineRest::Connection->new(
         url      => delete $args{url},
+        project  => delete $args{project},
         user     => delete $args{user},
-        password => delete $args{password}
+        password => delete $args{password},
+        apikey => delete $args{apikey}
     );
 
     return $class->SUPER::BUILDARGS(%args);

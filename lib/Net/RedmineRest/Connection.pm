@@ -3,29 +3,80 @@ use Moo;
 use URI;
 use Params::Validate;
 
-has url      => ( is => "rw",  required => 1 );
+has url =>      ( is => "rw",  required => 1 );
 has user     => ( is => "rw",  required => 1 );
-has password => ( is => "rw",  required => 1 );
+has password => ( is => "rw",  required => 0 );
+has apikey   => ( is => "rw",  required => 0 );
 
 has is_logined => ( is => "rw");
+has is_rest    => ( is => "rw");
 
-has _live_ticket_objects => (
-    is => "rw"
-);
+has _live_ticket_objects => ( is => "rw");
 
-has mechanize => (
-    is => "rw",
-    lazy => 1,
-    builder => 1,
-);
+has project => ( is => "rw", lazy => 1, builder => 1);
+has base_url => ( is => "rw", lazy => 1, builder => 1);
+
+has mechanize => ( is => "rw", lazy => 1, builder => 1);
+has rest => ( is => "rw", lazy => 1, builder => 1);
 
 use WWW::Mechanize;
 use REST::Client;
+
+sub GET {
+   my ($self,$url)=@_;
+   die 'GET:needs url' unless ( $url );
+   my $rest=$self->rest;
+   my $apikey=($self->apikey || '');
+   $rest->GET($url . '?key=' . $apikey);
+   return ($rest->responseCode, $rest->responseContent);
+}
+
+sub working_rest_connection {
+   my ( $self,%args ) = @_;
+   my ( $code,$content) = $self->GET($self->base_url . '/projects.json' );
+   if ( $code && $code == 200 ) {
+       return 1;
+   }
+}
+
+sub _build_project {
+   my ($self) = @_;
+
+   return $self->project if ( $self->project );
+   my ($project,$base_url)=$self->_parse_url();
+   return $project;
+}
+sub _build_base_url {
+   my ($self) = @_;
+   my ($project,$base_url)=$self->_parse_url();
+   $self->project($project) unless ( $self->project() ); 
+   return $base_url;
+}
+
+sub _parse_url {
+    my ($self) = @_;
+    my $url=$self->url();
+
+    my $o_uri = URI->new($url);
+    if ( $o_uri->path  ) {
+         if ( my ($project) = ($o_uri->path =~ m/^\/projects\/(.*)\s*$/i ) ) {
+              my ($base) = ($url =~ m/^\s*(.*)\/projects/i );
+              return ($project,$base);
+         }
+      }
+      return (' ',$url);;
+}
 
 sub _build_mechanize {
     my ($self) = @_;
     my $mech = WWW::Mechanize->new(autocheck => 0);
     return $mech;
+}
+
+sub _build_rest {
+    my ($self) = @_;
+    my $rtn = REST::Client->new();
+    return $rtn;
 }
 
 sub get_login_page {
@@ -40,10 +91,14 @@ sub get_login_page {
 
 sub assert_login {
     my $self = shift;
-    return if $self->is_logined;
+    return 1 if $self->is_logined;
+    if ( $self->working_rest_connection ) {
+        $self->is_rest(1);
+        $self->is_logined(1);
+        return 1; 
+    }
 
     my $mech = $self->get_login_page->mechanize;
-
     my $form_n = 0;
     my @forms = $mech->forms;
     for (@forms) {
@@ -69,21 +124,13 @@ sub assert_login {
         die "Can't login, invalid login or password !";
     }
     $self->is_logined(1);
+    return 1;
 
 }
 
 sub get_project_overview {
-    my ($self) = @_;
+    my ($self,$project) = @_;
     $self->assert_login;
-    my $client = REST::Client->new();
-    $client->GET(
-      $self->url . '/projects/test9876.xml'  
-    );
-    $DB::single=1;
-
-    $client->GET(
-      $self->url . '/projects/asfdlkjasdfkl.xml'  
-    );
 
     $self->mechanize->get( $self->url );
     return $self;
@@ -91,7 +138,6 @@ sub get_project_overview {
 
 sub get_issues_page {
     my ($self, $id) = @_;
-$DB::single=1;
     $self->get_project_overview();
       
     my $mech = $self->mechanize;
