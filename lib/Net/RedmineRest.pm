@@ -16,11 +16,15 @@ sub BUILDARGS {
     my %args = @_;
     $args{connection} = Net::RedmineRest::Connection->new(
         url      => delete $args{url},
-        project  => delete $args{project},
         user     => delete $args{user},
         password => delete $args{password},
         apikey => delete $args{apikey}
     );
+
+    if ( $args{project} ) {
+        $args{connection}->project($args{project}); 
+        delete $args{project}; 
+    }
 
     return $class->SUPER::BUILDARGS(%args);
 }

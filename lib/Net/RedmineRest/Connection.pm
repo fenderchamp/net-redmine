@@ -15,20 +15,73 @@ has _live_ticket_objects => ( is => "rw");
 
 has project => ( is => "rw", lazy => 1, builder => 1);
 has base_url => ( is => "rw", lazy => 1, builder => 1);
-
 has mechanize => ( is => "rw", lazy => 1, builder => 1);
 has rest => ( is => "rw", lazy => 1, builder => 1);
 
 use WWW::Mechanize;
 use REST::Client;
+use JSON;
+
+sub _prep_request {
+   my ($self,%args)=@_;
+   my $headers;    
+   my $url=$self->base_url().'/'.$args{service}.'.json';
+   $headers->{'Content-Type'}='application/json';
+   my $content;
+   $DB::single=1;
+   if ( $args{content} ) {
+      $args{content}->{key}=$self->apikey if ($self->apikey );
+      $content=encode_json $args{content} 
+   }
+   return ($url,$content,$headers);
+}
+
+sub POST {
+   my ($self,%args)=@_;
+
+   my ($url,$data,$headers) = $self->_prep_request(%args);
+   my $rest=$self->rest;
+   $rest->POST($url,$data,$headers);
+
+   my ($code,$content)=($rest->responseCode, $rest->responseContent);
+   $content=decode_json $content if ( $code == 201 && $content );
+   return ($code,$content);
+}
+
+sub PUT {
+   my ($self,%args)=@_;
+
+   my ($url,$data,$headers) = $self->_prep_request(%args);
+   my $rest=$self->rest;
+   $rest->PUT($url,$data,$headers);
+
+   my ($code,$content)=($rest->responseCode, $rest->responseContent);
+   $content=decode_json $content if ( $code == 200 && $content );
+   return ($code,$content);
+}
+
+sub DELETE {
+   my ($self,$url)=@_;
+   $self->_submit_id_only($url,'DELETE');
+}
 
 sub GET {
    my ($self,$url)=@_;
-   die 'GET:needs url' unless ( $url );
+   $self->_submit_id_only($url,'GET');
+}
+
+sub _submit_id_only {
+   my ($self,$url,$action)=@_;
+   $action='GET' unless ($action);
+
+   die '$action:needs url' unless ( $url );
    my $rest=$self->rest;
    my $apikey=($self->apikey || '');
-   $rest->GET($url . '?key=' . $apikey);
-   return ($rest->responseCode, $rest->responseContent);
+   $rest->$action($url . '?key=' . $apikey);
+
+   my ($code,$content)=($rest->responseCode, $rest->responseContent);
+   $content=decode_json $content if ( $code == 200 && $content );
+   return ($code,$content);
 }
 
 sub working_rest_connection {
@@ -41,22 +94,20 @@ sub working_rest_connection {
 
 sub _build_project {
    my ($self) = @_;
-
-   return $self->project if ( $self->project );
    my ($project,$base_url)=$self->_parse_url();
    return $project;
 }
+
 sub _build_base_url {
    my ($self) = @_;
    my ($project,$base_url)=$self->_parse_url();
-   $self->project($project) unless ( $self->project() ); 
+   $self->project($project) unless ( $self->project ); 
    return $base_url;
 }
 
 sub _parse_url {
     my ($self) = @_;
     my $url=$self->url();
-
     my $o_uri = URI->new($url);
     if ( $o_uri->path  ) {
          if ( my ($project) = ($o_uri->path =~ m/^\/projects\/(.*)\s*$/i ) ) {
