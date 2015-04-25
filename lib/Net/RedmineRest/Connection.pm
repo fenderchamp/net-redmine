@@ -44,6 +44,7 @@ sub POST {
    $rest->POST($url,$data,$headers);
 
    my ($code,$content)=($rest->responseCode, $rest->responseContent);
+   $DB::single=1;
    $content=decode_json $content if ( $code == 201 && $content );
    return ($code,$content);
 }
@@ -62,12 +63,12 @@ sub PUT {
 
 sub DELETE {
    my ($self,$url)=@_;
-   $self->_submit_id_only($url,'DELETE');
+   return $self->_submit_id_only($url,'DELETE');
 }
 
 sub GET {
    my ($self,$url)=@_;
-   $self->_submit_id_only($url,'GET');
+   return $self->_submit_id_only($url,'GET');
 }
 
 sub _submit_id_only {
