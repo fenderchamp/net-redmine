@@ -2,7 +2,6 @@ use Test::More;
 use Cwd 'getcwd';
 
 
-
 END {
     # system "kill -9 $REDMINE_SERVER_PID" if $REDMINE_SERVER_PID
 }
@@ -12,8 +11,24 @@ sub net_redmine_test {
 }
 
 sub new_net_redmine {
-    my ($server, $user, $password) = ("http://demo.redmine.org", "net-redmine-unit-tests", "net-redmine-unit-tests");
-    return Net::RedmineRest->new(url => $server,user => $user, password => $password);
+
+   #$my ($server, $user, $password, $apikey) = ("http://netredmine.m.redmine.org", "net-redmine-unit-tests-admin", "net-redmine-unit-tests","e366da4adfe8d242891c59cbd70a912d8d875d88");
+   my ($server, $user, $password, $apikey) = ("http://netredmine.m.redmine.org", "net-redmine-unit-tests", "net-redmine-unit-tests","7b7ae7e9f9aed7ffed823f55701bf745c119338c");
+   return Net::RedmineRest->new(url => $server,user => $user, password => $password, apikey => $apikey);
+
+}
+
+sub new_net_redmine_project {
+   my ($server, $user, $password, $apikey) = ("http://netredmine.m.redmine.org/projects/test", "net-redmine-unit-tests", "net-redmine-unit-tests","7b7ae7e9f9aed7ffed823f55701bf745c119338c");
+   return Net::RedmineRest->new(url => $server,user => $user, password => $password, apikey => $apikey);
+}
+
+sub project_test_data {
+    my $identifier='test'. $$;
+    my $name='testing' .$$;
+    my $description='test'.$$.' project';
+    my $homepage='http://www.test'.$$.'testing'.$$.'.nz';
+    return ($identifier, $name ,$description, $homepage) 
 }
 
 use Text::Greeking;
