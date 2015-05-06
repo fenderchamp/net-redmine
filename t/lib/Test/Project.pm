@@ -32,7 +32,7 @@ sub scrub_project_if_exists {
         connection => $self->r->connection,
         identifier => $self->identifier
     );
-    ok( !$project, "no actual $self->name project was found" );
+    ok( !$project, "no actual ".$self->name." project was found" );
 
 }
 
@@ -78,13 +78,13 @@ sub create_project_and_verify_its_there {
 sub regular_tests {
     my ( $self, $project, $tag ) = @_;
     ok( $project, '$project found' . $tag );
-    is( $project->name, $self->name, "name is $self->name" . $tag );
+    is( $project->name, $self->name, "name is ".$self->name." ".$tag );
     is( $project->identifier, $self->identifier,
-        "identifier is $self->identifier" . $tag );
+        "identifier is ".$self->identifier." ". $tag );
     is( $project->description, $self->description,
-        "description $self->description project" . $tag );
+        "description ".$self->description." project ". $tag );
     is( $project->homepage, $self->homepage,
-        "homepage $self->homepage" . $tag );
+        "homepage ".$self->homepage." ".$tag );
     my $id = $project->id;
     ok( $id, "project $id" );
 }
