@@ -12,6 +12,9 @@ has name        => ( is => 'rw' );
 has description => ( is => 'rw' );
 has homepage    => ( is => 'rw' );
 
+
+like ('a','m/^a$/','a matches a');
+
 sub scrub_project_if_exists {
 
     my ($self) = @_;
@@ -29,7 +32,7 @@ sub scrub_project_if_exists {
         connection => $self->r->connection,
         identifier => $self->identifier
     );
-    ok( !$project, 'no actual test998 project was found' );
+    ok( !$project, "no actual $self->name project was found" );
 
 }
 
@@ -42,7 +45,8 @@ sub create_project_and_verify_its_there {
         identifier  => $self->identifier,
         name        => $self->name,
         description => $self->description,
-        homepage    => $self->homepage
+        homepage    => $self->homepage,
+        tracker_ids => [1,2,3]
     );
 
     my $tag = ' created';
@@ -68,6 +72,7 @@ sub create_project_and_verify_its_there {
 
     $tag = ' loaded by identifier';
     $self->regular_tests( $project, $tag );
+    return $project;
 }
 
 sub regular_tests {

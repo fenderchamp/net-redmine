@@ -1,19 +1,23 @@
 #!/usr/bin/env perl -w
 use strict;
-use Test::More;
+use Test::More qw(no_plan);;
 use Net::RedmineRest;
 use DateTime;
 
 require 't/net_redmine_rest_test.pl';
-my $r = new_net_redmine();
 
-plan tests => 5;
+my $r = new_net_redmine_project();
+
 
 note "Testing about Net::RedmineRest::Ticket class";
 
 my $subject = "Testing Net::RedmineRest $$ " . time;
 
 note "The newly created ticket id should looks sane";
+
+ok($r->connection->project(),'project found');
+is($r->connection->project(),'test','project found');
+
 my $ticket = Net::RedmineRest::Ticket->create(
     connection => $r->connection,
     subject => $subject,

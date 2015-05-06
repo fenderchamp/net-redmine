@@ -2,9 +2,9 @@ package Net::RedmineRest;
 use Moo;
 our $VERSION = '0.09';
 use Net::RedmineRest::Connection;
-use Net::RedmineRest::Ticket;
-use Net::RedmineRest::Search;
+use Net::RedmineRest::Issue;
 use Net::RedmineRest::User;
+#use Net::RedmineRest::Search;
 
 has connection => (
     is => "ro",
@@ -31,7 +31,7 @@ sub BUILDARGS {
 
 sub create {
     my ($self, %args) = @_;
-    return $self->create_ticket(%$_) if $_ = $args{ticket};
+    return $self->create_ticket(%{$args{ticket}}) if $args{ticket};
 }
 
 sub copy {
@@ -55,11 +55,10 @@ sub lookup {
 
 sub create_ticket {
     my ($self, %args) = @_;
-    my $t = Net::RedmineRest::Ticket->create(
+    my $t = Net::RedmineRest::Issue->create(
         connection => $self->connection,
         %args
     );
-
     return $self->lookup_ticket(id => $t->id);
 }
 
@@ -67,18 +66,19 @@ sub lookup_ticket {
     my ($self, %args) = @_;
 
     if (my $id = $args{id}) {
-        return Net::RedmineRest::Ticket->load(connection => $self->connection, id => $id);
+        return Net::RedmineRest::Issue->load(connection => $self->connection, id => $id);
     }
 }
 
 sub search_ticket {
     my ($self, $query) = @_;
 
-    my $search = Net::RedmineRest::Search->new(
-        connection => $self->connection,
-        type => ['ticket'],
-        query => $query
-    );
+    my $search;
+    #my $search = Net::RedmineRest::Search->new(
+    #    connection => $self->connection,
+    #    type => ['ticket'],
+    #    query => $query
+    #);
     return $search;
 }
 
@@ -167,7 +167,7 @@ contain C<subject> and <description> of the ticket. For example:
         description => "Found a bug in the bag"
     });
 
-The returned value of this method is a C<Net::RedmineRest::Ticket> object.
+The returned value of this method is a C<Net::RedmineRest::Issue> object.
 Also read the document of that class to see how to use it.
 
 =item copy( ticket => {id => Integer, ... } }
@@ -179,7 +179,7 @@ key is the same hasref as for C<create>.
 =item lookup( ticket => { id => Integer } }
 
 Given a ticket id, this instance method load the ticket content from
-the server, it also returns a C<Net::RedmineRest::Ticket> object.
+the server, it also returns a C<Net::RedmineRest::Issue> object.
 
 At this point, only C<id> can be specified.
 

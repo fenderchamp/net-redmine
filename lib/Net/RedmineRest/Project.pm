@@ -17,7 +17,7 @@ has  updated_on => ( is=>"rw" );
 has  status => ( is=>"rw" ); 
 
 has  inherit_members => ( is=>"rw" ); #true or false
-has  tracker_ids => ( is=>"rw" ); #(repeatable element) the tracker id: 1 for Bug, etc.
+has  tracker_ids => ( is=>"rw",default => sub { return [] } ); #(repeatable element) the tracker id: 1 for Bug, etc.
 has  enabled_module_names => ( is=>"rw" ); #(repeatable element) the module name: boards, calendar, documents, files, gantt, issue_tracking, news, repository, time_tracking, wiki.
   
 has id          => (is => "rw");
@@ -36,6 +36,10 @@ sub _provide_data {
     $project->{name}=$self->name if (defined($self->name) );
     $project->{status}=$self->status if (defined($self->status) );
     $project->{updated_on}=$self->udpated_on if (defined($self->updated_on) );
+    foreach my $tracker_id (@{$self->tracker_ids}) {
+       push @{$project->{tracker_ids}} ,$tracker_id;
+    }
+
 
     my $content;
     $content->{project}=$project;

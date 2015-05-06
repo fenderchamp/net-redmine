@@ -24,11 +24,15 @@ use JSON;
 
 sub _prep_request {
    my ($self,%args)=@_;
+
    my $headers;    
-   my $url=$self->base_url().'/'.$args{service}.'.json';
+
+   my $url=$self->base_url().'/'.$args{service};
+   $url=$url.'/'.$args{id} if ( defined($args{id}) );
+   $url=$url.'.json';
+
    $headers->{'Content-Type'}='application/json';
    my $content;
-   $DB::single=1;
    if ( $args{content} ) {
       $args{content}->{key}=$self->apikey if ($self->apikey );
       $content=encode_json $args{content} 
@@ -44,14 +48,12 @@ sub POST {
    $rest->POST($url,$data,$headers);
 
    my ($code,$content)=($rest->responseCode, $rest->responseContent);
-   $DB::single=1;
    $content=decode_json $content if ( $code == 201 && $content );
    return ($code,$content);
 }
 
 sub PUT {
    my ($self,%args)=@_;
-
    my ($url,$data,$headers) = $self->_prep_request(%args);
    my $rest=$self->rest;
    $rest->PUT($url,$data,$headers);
@@ -78,7 +80,9 @@ sub _submit_id_only {
    die '$action:needs url' unless ( $url );
    my $rest=$self->rest;
    my $apikey=($self->apikey || '');
-   $rest->$action($url . '?key=' . $apikey);
+   my $delim='?';
+   $delim='&' if ($url =~ /\.json\?/ );
+   $rest->$action($url.${delim}.'key=' . $apikey);
 
    my ($code,$content)=($rest->responseCode, $rest->responseContent);
    $content=decode_json $content if ( $code == 200 && $content );

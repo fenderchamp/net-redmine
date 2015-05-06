@@ -2,6 +2,7 @@ package Net::RedmineRest::Ticket;
 use Moo;
 use Net::RedmineRest::TicketHistory;
 use Net::RedmineRest::User;
+use Net::RedmineRest::Project;
 use DateTimeX::Easy;
 use REST::Client;
 
@@ -27,54 +28,36 @@ has histories   => (is => "rw", lazy=>1, builder => 1);
 
 
 sub _build_project {
-   my ($self)=@_;
-   return $self->connection->project() 
-       if $self->connection() && $self->connection->project(); 
+#   my ($self)=@_;
+#   my $project_identifier=$self->connection->project() 
+#       if $self->connection && $self->connection->project(); 
+#   return Net::RedmineRest::Project->load(
+#      connection=>$self->connection,
+#      identifier=>$project
+#   );
 }
 
 sub create {
     my ($class, %attr) = @_;
 
     my $self = $class->new(%attr);
+
     my $c=$self->connection;
 
-    my $issue;
-    $issue->{service}=1;
-    $issue->{description}=1;
-    $issue->{project_id}=1;
-    $issue->{tracker_id}=1;
-    $issue->{status_id}=1;
-    $issue->{priority_id}=1;
-    $issue->{subject}=1;
-    $issue->{description}=1;
-    $issue->{category_id}=1;
+    my $data=$self->_provide_default_data();
 
-    $c->POST(
+    my $project=$self->project();
+    die 'need associated project to create issue/ticket' unless ($project);
+    my $project_id=$project->id();
+    $data->{project_id}=$project_id;
+
+    my $content;
+    $content->{$self->service()}=$data;
+    my ($code,$response) = $c->POST(
          service=>$self->service,
-         subject=>$self->subject,
-         description=>$self->description,
-         project=>$self->project
-     );
+         content=>$content
+    );
 
-
-    $c->get_project_overview();
-
-    my $mech = $self->connection->get_new_issue_page()->mechanize;
-
-    $mech->form_id("issue-form");
-    $mech->field("issue[subject]" => $self->subject);
-    $mech->field("issue[description]" => $self->description);
-    $mech->submit;
-
-    unless ($mech->response->is_success) {
-        die "Failed to create a new ticket\n";
-    }
-
-    if ($mech->uri =~ m[/issues(?:/show)?/(\d+)$]) {
-        my $id = $1;
-        $self->id($id);
-        return $self;
-    }
 }
 
 # use IO::All;
@@ -106,7 +89,6 @@ sub refresh {
     eval '$self->connection->get_issues_page($id)';
     if ($@) { warn $@; return }
 
-$DB::single=1;
     my $p = pQuery($self->connection->mechanize->content);
     my $wc = new HTML::WikiConverter( dialect => 'Markdown' );
     my $description = $wc->html2wiki( Encode::encode_utf8($p->find(".issue .wiki")->html) );
@@ -202,6 +184,18 @@ sub _build_histories {
         } (0..$n)
     ];
 }
+
+sub _provide_default_data { 
+    #my $data;
+    #$data->{description}=$self->description;
+    ##$data->{tracker_id}=1;
+    ##$data->{status_id}=1;
+    ##$data->{priority_id}=1;
+    #$data->{description}=1;
+    ##$data->{category_id}=1;
+    #return $data;
+}
+
 
 __PACKAGE__->meta->make_immutable;
 1;

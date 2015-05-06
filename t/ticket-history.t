@@ -1,14 +1,35 @@
 #!/usr/bin/env perl -w
 use strict;
-use Test::More;
-use Net::Redmine;
+
+use Net::RedmineRest;
+use Net::RedmineRest::TicketHistory;
+use Test::Project;
 use Regexp::Common;
 use Regexp::Common::Email::Address;
+use DateTime;
 
-require 't/net_redmine_test.pl';
+require 't/net_redmine_rest_test.pl';
+
 my $r = new_net_redmine();
 
-plan tests => 17;
+my ( $identifier, $name, $description, $homepage ) = project_test_data();
+
+my $test_project = Test::Project->new(
+    r           => $r,
+    identifier  => $identifier,
+    name        => $name,
+    description => $description,
+    homepage    => $homepage
+);
+
+$test_project->scrub_project_if_exists();
+my $p=$test_project->create_project_and_verify_its_there();
+
+undef $r;
+$r = new_net_redmine();
+
+#create project url path
+$r->connection->{url}=$r->connection->{url}.'/projects/'.$p->identifier;
 
 ### Prepare a new ticket with multiple histories
 my $t = $r->create(
@@ -17,6 +38,7 @@ my $t = $r->create(
         description => __FILE__ . " (description)"
     }
 );
+
 
 $t->subject( $t->subject . " 2" );
 $t->save;
@@ -29,16 +51,21 @@ $t->save;
 
 ### Examine its histories
 
-use Net::Redmine::TicketHistory;
 
 {
     # The 0th history entry has a specially meaning of "ticket creation".
-    my $h = Net::Redmine::TicketHistory->new(
+    my $h = Net::RedmineRest::TicketHistory->new(
         connection => $r->connection,
         id => 0,
         ticket_id => $t->id
     );
-    ok($h->can("ticket"));
+
+    isa_ok($h,'Net::RedmineRest::TicketHistory','th is a Net::RedmineRest::TicketHistory');
+
+    like ($h->author->email, qr/^$RE{Email}{Address}$/,'email is sane for author');
+$DB::single=1;
+    is($h->date->ymd, DateTime->now->ymd, 'th 0 date as expected');
+    ok($h->can("ticket"),'ticket history has ticket method');
 
     my $prop = $h->property_changes;
 
@@ -47,19 +74,25 @@ use Net::Redmine::TicketHistory;
         {
             from => "",
             to => __FILE__ . " 1",
-        }
+        },
+        'deeply property changes match whats expected'
     );
 
-    like $h->author->email, qr/^$RE{Email}{Address}$/;
 }
 
 {
-    my $h = Net::Redmine::TicketHistory->new(
+    my $h = Net::RedmineRest::TicketHistory->new(
         connection => $r->connection,
         id => 1,
         ticket_id => $t->id
     );
-    ok($h->can("ticket"));
+
+
+    isa_ok($h,'Net::RedmineRest::TicketHistory','th 1 is a Net::RedmineRest::TicketHistory');
+    like ($h->author->email, qr/^$RE{Email}{Address}$/,'email 1 is sane for author');
+    is($h->date->ymd, DateTime->now->ymd, 'th 1 date as expected');
+    ok($h->can("journal"),'can journal');
+    ok($h->can("ticket"),'can ticket');
 
     my $prop = $h->property_changes;
 
@@ -68,21 +101,24 @@ use Net::Redmine::TicketHistory;
         {
             from => __FILE__ . " 1",
             to => __FILE__ . " 1 2",
-        }
+        },
+        'property_change 1 is good' 
     );
 
-    like $h->author->email, qr/^$RE{Email}{Address}$/;
 }
 
+
 {
-    my $h = Net::Redmine::TicketHistory->new(
+    my $h = Net::RedmineRest::TicketHistory->new(
         connection => $r->connection,
         id => 2,
         ticket_id => $t->id
     );
-    ok($h->can("ticket"));
+    ok($h->can("ticket"),'can ticket');
 
-    like $h->note, qr/it is good. \d+/;
+    like($h->note, qr/it is good. \d+/,'th 2 note matches');
+    is($h->date->ymd, DateTime->now->ymd, 'th 2 date as expected');
+    like ($h->author->email, qr/^$RE{Email}{Address}$/,'th 2 email is sane for author');
 
     my $prop = $h->property_changes;
 
@@ -91,10 +127,10 @@ use Net::Redmine::TicketHistory;
         {
             from => __FILE__ . " 1 2",
             to => __FILE__ . " 1 2 3",
-        }
+        },
+        'property_change th 2 is good' 
     );
 
-    like $h->author->email, qr/^$RE{Email}{Address}$/;
 }
 
 {
@@ -102,18 +138,24 @@ use Net::Redmine::TicketHistory;
     is(0+@$histories, 3, "This ticket has three history entires");
 
     foreach my $h (@$histories) {
+        isa_ok($h,'Net::RedmineRest::TicketHistory','h is a Net::RedmineRest::TicketHistory');
+        ok($h->can("id"),"can id ". $h->id);
         like($h->author->email, qr/^$RE{Email}{Address}$/, "examine ticket author email");
     }
 
     # require YAML;
     # die YAML::Dump($histories->[0]);
+    is( $histories->[0]->date->ymd, DateTime->now->ymd, 'date 0 as expected ticket');
+    is( $histories->[1]->date->ymd, DateTime->now->ymd, 'date 1 as expected journal 0');
+    is( $histories->[2]->date->ymd, DateTime->now->ymd, 'date 2 as expected journal 1');
 
     is_deeply(
         $histories->[0]->property_changes->{subject},
         {
             from => "",
             to => __FILE__ . " 1",
-        }
+        },
+        'property_change th 0 is good' 
     );
 
     is_deeply(
@@ -121,7 +163,8 @@ use Net::Redmine::TicketHistory;
         {
             from => __FILE__ . " 1",
             to => __FILE__ . " 1 2",
-        }
+        },
+        'property_change th 1 is good' 
     );
 
     is_deeply(
@@ -129,6 +172,9 @@ use Net::Redmine::TicketHistory;
         {
             from => __FILE__ . " 1 2",
             to => __FILE__ . " 1 2 3",
-        }
+        },
+        'property_change th 2 is good' 
     );
 }
+
+$test_project->scrub_project_if_exists();

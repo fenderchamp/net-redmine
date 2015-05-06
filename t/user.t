@@ -1,40 +1,68 @@
 #!/usr/bin/env perl -w
 use strict;
-use Test::Cukes;
-use Regexp::Common;
-use Regexp::Common::Email::Address;
+use Net::RedmineRest;
+use Net::RedmineRest::User;
+use Test::More qw(no_plan);
 
-use Net::Redmine;
-require 't/net_redmine_test.pl';
+require 't/net_redmine_rest_test.pl';
 
 my $r = new_net_redmine();
-my $user;
+my $current_user = Net::RedmineRest::User->load(
+    connection => $r->connection,
+    id => 'current'
+);
 
-Given qr/the user with id 1 exists/ => sub {
-    $r->connection->assert_login;
-    $r->connection->get_user_page(id => 1);
+ok($current_user,'current user is def');
+ok($current_user->firstname,'current has firsname');
+ok($current_user->lastname,'current has lastname');
+ok($current_user->login,'current has login');
+ok($current_user->mail,'current has mail');
 
-    my $content = $r->connection->mechanize->content;
-    assert index($content, "Registered on:") > 0;
-};
+my $new_user = Net::RedmineRest::User->create(
+    connection => $r->connection,
+    firstname => 'firstname',
+    lastname => 'lastname',
+    login => 'login',
+    mail => 'mail@mail.net',
+    password => 'testpassword'
+);
 
-When qr/the user info is crawled/ => sub {
-    $user = $r->lookup(user => {id => 1});
-};
+ok($new_user,'new user is def');
+ok($new_user->firstname,'new has firstname');
+ok($new_user->lastname,'new has lastname');
+ok($new_user->login,'new has login');
+ok($new_user->mail,'new has mail');
+ok($new_user->id,'new has id');
 
-Then qr/his email should be known/ => sub {
-    assert $user->email =~ m/^$RE{Email}{Address}$/;
-};
+my $loaded_user = Net::RedmineRest::User->load(
+    connection => $r->connection,
+    id => $new_user->id
+);
 
-local $/ = undef;
-runtests(<DATA>);
+ok($loaded_user,'loaded user is def');
+ok($loaded_user->firstname,'loaded has firstname');
+ok($loaded_user->lastname,'loaded has lastname');
+ok($loaded_user->login,'loaded has login');
+ok($loaded_user->mail,'loaded has mail');
+ok($loaded_user->id,'loaded has id');
 
-__DATA__
+is($new_user->firstname, $loaded_user->firstname, 'match firtsname');
+is($new_user->lastname, $loaded_user->lastname, 'match lastname');
+is($new_user->login, $loaded_user->login, 'match login');
+is($new_user->mail, $loaded_user->mail, 'match mail');
+is($new_user->id, $loaded_user->id,'match id');
 
-Feature: Crawling Redmine User info
-  for the good deed
+$loaded_user->destroy();
+undef($loaded_user);
 
-  Scenario: user basic info
-    Given the user with id 1 exists
-    When the user info is crawled
-    Then his email should be known
+$loaded_user = Net::RedmineRest::User->load(
+    connection => $r->connection,
+    id => $new_user->id
+);
+
+ok(!$loaded_user,'user is no more');
+
+$DB::single=1;
+my $a;
+
+
