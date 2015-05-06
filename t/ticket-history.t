@@ -22,14 +22,13 @@ my $test_project = Test::Project->new(
     homepage    => $homepage
 );
 
-$test_project->scrub_project_if_exists();
-my $p=$test_project->create_project_and_verify_its_there();
+my $url = $test_project->valid_project_url;
 
 undef $r;
 $r = new_net_redmine();
-
 #create project url path
-$r->connection->{url}=$r->connection->{url}.'/projects/'.$p->identifier;
+$r->connection->{url}=$url;
+
 
 ### Prepare a new ticket with multiple histories
 my $t = $r->create(
@@ -38,7 +37,6 @@ my $t = $r->create(
         description => __FILE__ . " (description)"
     }
 );
-
 
 $t->subject( $t->subject . " 2" );
 $t->save;
@@ -63,7 +61,6 @@ $t->save;
     isa_ok($h,'Net::RedmineRest::TicketHistory','th is a Net::RedmineRest::TicketHistory');
 
     like ($h->author->email, qr/^$RE{Email}{Address}$/,'email is sane for author');
-$DB::single=1;
     is($h->date->ymd, DateTime->now->ymd, 'th 0 date as expected');
     ok($h->can("ticket"),'ticket history has ticket method');
 

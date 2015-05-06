@@ -89,5 +89,16 @@ sub regular_tests {
     ok( $id, "project $id" );
 }
 
+sub valid_project_url {
+    	my ( $self ) = @_;
+	$self->scrub_project_if_exists();
+	my $p=$self->create_project_and_verify_its_there();		
+	my $r=$self->r;
+	return $r->connection->{url}.'/projects/'.$self->identifier;
+}
+
+
+
+
 __PACKAGE__->meta->make_immutable;
 1;
