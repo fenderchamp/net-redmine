@@ -123,8 +123,6 @@ sub _get {
     return($code,$content);
 }
 
-
-
 sub destroy {
     my ($self) = @_;
     $self->response_code(0);
@@ -135,6 +133,7 @@ sub destroy {
     $self->response_code($code);
     if ( $code == 200 ) {
       $self->status('DELETED');
+      $self->clean_cache() if ($self->can('clean_cache') );
     } 
 }
 
