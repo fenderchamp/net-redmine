@@ -49,9 +49,29 @@ has status        => ( is=>"rw" );
 has subject       => ( is=>"rw" );
 has tracker       => ( is=>"rw" );
 has updated_on    => ( is=>"rw" );
+
+
 has watcher_user => ( is=>"rw" ); #- Array of user ids to add as watchers (since 2.3.0)
 
 has json          => (is => "rw");
+
+
+sub cache { 
+    my ($self)=(@_);
+    $self->connection->live_ticket_objects->{$self->id}=$self;
+}
+
+sub fetch_cache { 
+    my ($self,%args)=@_;
+    my $id=$args{id}; 	
+    return undef unless $id;  
+    my $connection=$args{connection}; 	
+    return undef unless $connection;
+    my $live=$connection->live_ticket_objects;
+    return undef unless $live;
+    return $live->{$id};
+}
+
 
 sub note {
    my ($self,$data)=@_;

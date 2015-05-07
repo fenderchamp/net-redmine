@@ -64,7 +64,6 @@ sub create_ticket {
 
 sub lookup_ticket {
     my ($self, %args) = @_;
-
     if (my $id = $args{id}) {
         return Net::RedmineRest::Issue->load(connection => $self->connection, id => $id);
     }

@@ -11,7 +11,8 @@ has apikey   => ( is => "rw",  required => 0 );
 has is_logined => ( is => "rw");
 has is_rest    => ( is => "rw");
 
-has _live_ticket_objects => ( is => "rw");
+has _live_ticket_objects => ( is => "rw", lazy=>1, builder => 1);
+
 
 has project => ( is => "rw", lazy => 1, builder => 1);
 has base_url => ( is => "rw", lazy => 1, builder => 1);
@@ -21,6 +22,10 @@ has rest => ( is => "rw", lazy => 1, builder => 1);
 use WWW::Mechanize;
 use REST::Client;
 use JSON;
+
+sub _build__live_ticket_objects { return {} };
+
+sub live_ticket_objects { return $_[0]->_live_ticket_objects };
 
 sub _prep_request {
    my ($self,%args)=@_;

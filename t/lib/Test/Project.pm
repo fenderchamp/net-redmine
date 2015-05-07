@@ -13,8 +13,6 @@ has description => ( is => 'rw' );
 has homepage    => ( is => 'rw' );
 
 
-like ('a','m/^a$/','a matches a');
-
 sub scrub_project_if_exists {
 
     my ($self) = @_;

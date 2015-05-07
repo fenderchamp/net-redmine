@@ -56,7 +56,7 @@ sub create {
     $self->response_code($code);
     if ($code =~ /^2/ ) { 
       $self->json($response->{$self->entity});
-      $self->refresh();
+      $self->_refresh();
       return $self;
     }  
 
@@ -69,6 +69,12 @@ sub load {
     if ( $class->can('_has_required_load_args')) { 
       $args=$class->_has_required_load_args(%attr);
     }
+
+    if ( $class->can('fetch_cache') ) {
+        my $o=$class->fetch_cache(%attr); 
+	return $o if ( $o );
+    }	
+
     my $self = $class->new(%attr);
     return $self->_process_response($self->_get(%$args));
 }
@@ -86,11 +92,18 @@ sub _has_required_load_args {
     return {id=>$id};
 }
 
+sub _refresh {
+   my ($self) = @_;
+   $self->refresh();
+   $self->cache if ( $self->can('cache') );
+}	
+
+
 sub _process_response {
     my ($self,$code,$content)=@_;
     if ( $code == 200 ) {
       $self->json($content->{$self->entity});
-      $self->refresh();
+      $self->_refresh();
       return $self;
     }
 }
