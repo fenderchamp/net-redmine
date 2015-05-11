@@ -62,7 +62,3 @@ $loaded_user = Net::RedmineRest::User->load(
 
 ok(!$loaded_user,'user is no more');
 
-$DB::single=1;
-my $a;
-
-

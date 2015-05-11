@@ -71,7 +71,7 @@ sub _provide_data {
 
 }
 
-sub refresh {
+sub refresh_from_json {
 
    my ($self,%args)=@_;
    my $json=$self->json;

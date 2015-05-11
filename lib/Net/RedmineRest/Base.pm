@@ -79,6 +79,11 @@ sub load {
     return $self->_process_response($self->_get(%$args));
 }
 
+sub refresh {
+    my ($self)=@_;
+    $self->_reload();
+}
+
 sub _reload {
     my ($self)=@_;
     my $id=$self->id;
@@ -94,7 +99,7 @@ sub _has_required_load_args {
 
 sub _refresh {
    my ($self) = @_;
-   $self->refresh() if $self->can('refresh');
+   $self->refresh_from_json() if $self->can('refresh_from_json');
    $self->cache if ( $self->can('cache') );
 }	
 
