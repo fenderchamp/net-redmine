@@ -34,3 +34,4 @@ $ticket2->refresh;
 is( $ticket2->description, $ticket->description,
     "ticket content is refreshed" );
 
+$test_project->scrub_project_if_exists;
