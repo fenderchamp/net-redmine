@@ -19,16 +19,9 @@ my $test_project = Test::Project->new(
     identifier  => $identifier,
     name        => $name,
     description => $description,
-    homepage    => $homepage
+    homepage    => $homepage,
+    initialize  => 1
 );
-
-my $url = $test_project->valid_project_url;
-
-undef $r;
-$r = new_net_redmine();
-#create project url path
-$r->connection->{url}=$url;
-
 
 ### Prepare a new ticket with multiple histories
 my $t = $r->create(

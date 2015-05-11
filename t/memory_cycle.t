@@ -15,15 +15,11 @@ my $test_project = Test::Project->new(
     identifier  => $identifier,
     name        => $name,
     description => $description,
-    homepage    => $homepage
+    homepage    => $homepage,
+    initialize  => 1
 );
 
-my $url = $test_project->valid_project_url;
-
-undef $r;
-$r = new_net_redmine();
-#create project url path
-$r->connection->{url}=$url;
+#$test_project->data_initialize();
 
 my $t1 = $r->create(
     ticket => {

@@ -6,13 +6,21 @@ use Net::RedmineRest;
 use Net::RedmineRest::Project;
 use Moo;
 
-has r           => ( is => 'rw' );
+has r           => ( is       => 'rw',
+);
+
 has identifier  => ( is => 'rw' );
 has name        => ( is => 'rw' );
 has description => ( is => 'rw' );
 has homepage    => ( is => 'rw' );
+has initialize  => ( is =>'ro');
 
-
+sub BUILD {
+    my $self = shift;
+    if ( $self->initialize ) {
+      $self->data_initialize();
+    }
+}
 sub scrub_project_if_exists {
 
     my ($self) = @_;
@@ -87,16 +95,14 @@ sub regular_tests {
     ok( $id, "project $id" );
 }
 
-sub valid_project_url {
-    	my ( $self ) = @_;
+sub data_initialize {
+   my ( $self ) = @_;
 	$self->scrub_project_if_exists();
 	my $p=$self->create_project_and_verify_its_there();		
-	my $r=$self->r;
-	return $r->connection->{url}.'/projects/'.$self->identifier;
+	my $url=$self->r->connection->{url}.'/projects/'.$self->identifier;
+   $self->r->reset_connection(url=>$url);
+
 }
-
-
-
 
 __PACKAGE__->meta->make_immutable;
 1;

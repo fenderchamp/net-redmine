@@ -1,6 +1,8 @@
 use Test::More;
 use Cwd 'getcwd';
 
+use Net::RedmineRest;
+
 
 END {
     # system "kill -9 $REDMINE_SERVER_PID" if $REDMINE_SERVER_PID
@@ -18,15 +20,6 @@ sub new_net_redmine {
 
 }
 
-sub new_net_redmine_project {
-   my ($server, $user, $password, $apikey) = (
-       "http://netredmine.m.redmine.org/projects/test", 
-       "net-redmine-unit-tests", 
-       "net-redmine-unit-tests",
-       "7b7ae7e9f9aed7ffed823f55701bf745c119338c");
-   return Net::RedmineRest->new(url => $server,user => $user, password => $password, apikey => $apikey);
-}
-
 sub project_test_data {
     my $identifier='test'. $$;
     my $name='testing' .$$;
@@ -38,15 +31,8 @@ sub project_test_data {
 use Text::Greeking;
 
 sub new_tickets {
-    my ($r, $n, $p) = @_;
+    my ($r, $n) = @_;
     $n ||= 1;
-    my $project_id;
-    if ($p) {
-       $project=$p;
-    } elsif ( $r->project ){
-      $project = $r->project;
-    } 
-
     my $g = Text::Greeking->new;
     $g->paragraphs(1,1);
     $g->sentences(1,1);
@@ -58,7 +44,6 @@ sub new_tickets {
         $r->create(
             ticket => {
                 subject => "$filename, line $line " . $g->generate,
-                project => $project,
                 description => $g->generate
             }
         );

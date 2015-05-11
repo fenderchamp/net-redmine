@@ -10,23 +10,14 @@ my $r = new_net_redmine();
 
 my ($identifier, $name, $description, $homepage ) = project_test_data();
 
-
 my $test_project = Test::Project->new(
     r           => $r,
     identifier  => $identifier,
     name        => $name,
     description => $description,
-    homepage    => $homepage
+    homepage    => $homepage,
+    initialize  => 1
 );
-
-my $url = $test_project->valid_project_url;
-
-undef $r;
-$r = new_net_redmine();
-
-#create project url path
-
-$r->connection->{url}=$url;
 
 note "Testing the top-level Net::Redmine object API";
 
@@ -52,8 +43,4 @@ use Scalar::Util qw(refaddr);
 is refaddr($t2), refaddr($t1), 
 	"ticket objects with the same ID should be identical."; 
 
-
 $test_project->scrub_project_if_exists;
-
-
-

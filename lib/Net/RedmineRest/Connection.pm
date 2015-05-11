@@ -96,10 +96,16 @@ sub _submit_id_only {
 
 sub working_rest_connection {
    my ( $self,%args ) = @_;
-   my ( $code,$content) = $self->GET($self->base_url . '/projects.json' );
+   my ( $code,$content) = $self->projects_list();
    if ( $code && $code == 200 ) {
        return 1;
    }
+
+}
+sub projects_list {
+   my ( $self,%args ) = @_;
+   my ( $code,$content) = $self->GET($self->base_url . '/projects.json' );
+   return  ( $code,$content);
 }
 
 sub _build_project {

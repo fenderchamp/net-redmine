@@ -1,13 +1,22 @@
 #!/usr/bin/env perl -w
 use strict;
-use Test::More;
-use Net::Redmine;
+use Net::RedmineRest;
+use Test::Project;
 
-require 't/net_redmine_test.pl';
-
-plan tests => 1;
+require 't/net_redmine_rest_test.pl';
 
 my $r = new_net_redmine();
+
+my ( $identifier, $name, $description, $homepage ) = project_test_data();
+
+my $test_project = Test::Project->new(
+    r           => $r,
+    identifier  => $identifier,
+    name        => $name,
+    description => $description,
+    homepage    => $homepage,
+    initialize  => 1
+);
 
 ### Prepare new tickets
 my ($ticket) = new_tickets($r, 1);
@@ -15,6 +24,7 @@ my $id = $ticket->id;
 
 $ticket->destroy;
 
-my $t2 = Net::Redmine::Ticket->load(connection => $r->connection, id => $id);
+my $t2 = Net::RedmineRest::Issue->load(connection => $r->connection, id => $id);
 
 is($t2, undef, "loading a deleted ticket should return undef.");
+$test_project->scrub_project_if_exists;

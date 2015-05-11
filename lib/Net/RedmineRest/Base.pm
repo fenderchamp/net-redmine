@@ -72,7 +72,7 @@ sub load {
 
     if ( $class->can('fetch_cache') ) {
         my $o=$class->fetch_cache(%attr); 
-	return $o if ( $o );
+	     return $o if ( $o );
     }	
 
     my $self = $class->new(%attr);
@@ -94,10 +94,9 @@ sub _has_required_load_args {
 
 sub _refresh {
    my ($self) = @_;
-   $self->refresh();
+   $self->refresh() if $self->can('refresh');
    $self->cache if ( $self->can('cache') );
 }	
-
 
 sub _process_response {
     my ($self,$code,$content)=@_;
@@ -106,6 +105,7 @@ sub _process_response {
       $self->_refresh();
       return $self;
     }
+    return undef;
 }
 
 sub _get { 
@@ -140,13 +140,15 @@ sub destroy {
 sub _service_url {
     my ($self,%args)=@_;
     my $id=$args{id};
-    $id = $self->id unless ($id); 
+    unless ($id)  {
+       $id = $self->id if $self->can('id');
+    }
 
     my $c = $self->connection;
     my $uri = URI->new($c->base_url);
 
     my $path='/'.$self->service;
-    $path.='/'.$id if($id);
+    $path.='/'.$id if(defined($id));
     $path.='.json';
 
     $uri->path($path);

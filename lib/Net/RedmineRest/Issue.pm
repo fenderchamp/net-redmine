@@ -1,8 +1,9 @@
 package Net::RedmineRest::Issue;
 use Moo;
+use Net::RedmineRest::Project;
 use Net::RedmineRest::Simple;
-use Net::RedmineRest::User;
 use Net::RedmineRest::TicketHistory;
+use Net::RedmineRest::User;
 
 use DateTimeX::Easy;
 

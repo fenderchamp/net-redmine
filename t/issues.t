@@ -75,7 +75,7 @@ $issue2 = Net::RedmineRest::Issue->load(
     id => $issue->id
 );
 
-is($issue2,'','no issue after destroy');
+is($issue2,undef,'no issue after destroy');
 $t->scrub_project_if_exists();
 
 

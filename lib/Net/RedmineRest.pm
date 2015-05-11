@@ -3,11 +3,13 @@ use Moo;
 our $VERSION = '0.09';
 use Net::RedmineRest::Connection;
 use Net::RedmineRest::Issue;
+use Net::RedmineRest::Project;
+use Net::RedmineRest::ProjectList;
 use Net::RedmineRest::User;
 #use Net::RedmineRest::Search;
 
 has connection => (
-    is => "ro",
+    is => "rwp",
     required => 1
 );
 
@@ -27,6 +29,24 @@ sub BUILDARGS {
     }
 
     return $class->SUPER::BUILDARGS(%args);
+}
+
+sub reset_connection {
+
+   my ($self,%args)=@_;
+
+   my $url=($args{url} || $self->connection->url);
+   my $user=($args{user} || $self->connection->user);
+   my $password=($args{password} || $self->connection->password);
+   my $apikey=($args{apikey} || $self->connection->apikey);
+    $self->_set_connection ( Net::RedmineRest::Connection->new(
+        url      => $url, 
+        user     => $user,
+        password => $password,
+        apikey =>  $apikey
+      )
+   );
+
 }
 
 sub create {
@@ -49,6 +69,7 @@ sub copy {
 
 sub lookup {
     my ($self, %args) = @_;
+    return $self->lookup_project(%$_) if $_ = $args{project};
     return $self->lookup_ticket(%$_) if $_ = $args{ticket};
     return $self->lookup_user(%$_) if $_ = $args{user};
 }
@@ -62,12 +83,27 @@ sub create_ticket {
     return $self->lookup_ticket(id => $t->id);
 }
 
+sub load_projects {
+    my ($self, %args) = @_;
+    my $project_list=Net::RedmineRest::ProjectList->load(connection => $self->connection, %args);
+    return $project_list->projects;
+}
+
+sub lookup_project {
+    my ($self, %args) = @_;
+    if ($args{id} || $args{identifier} ) {
+        return Net::RedmineRest::Project->load(connection => $self->connection, %args);
+    }
+}
+
 sub lookup_ticket {
     my ($self, %args) = @_;
-    if (my $id = $args{id}) {
+    if (my $id = $args{id} ) {
         return Net::RedmineRest::Issue->load(connection => $self->connection, id => $id);
     }
 }
+
+
 
 sub search_ticket {
     my ($self, $query) = @_;
