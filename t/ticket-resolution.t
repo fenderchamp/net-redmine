@@ -1,7 +1,9 @@
 #!/usr/bin/env perl -w
 use strict;
-use Test::More;
+use Test::Project;
 use Net::RedmineRest;
+use Net::RedmineRest::Ticket;
+use Test::More;
 
 require 't/net_redmine_rest_test.pl';
 
@@ -9,8 +11,8 @@ my $r = new_net_redmine();
 
 my ( $identifier, $name, $description, $homepage ) = project_test_data();
 
-$test_project = Test::Project->new(
-    r           => new_net_redmine(),
+my $test_project = Test::Project->new(
+    r           => $r,
     identifier  => $identifier,
     name        => $name,
     description => $description,
@@ -33,11 +35,11 @@ my $id;
     $t1->save;
 
     $id = $t1->id;
-    diag "The newly created ticket id = $id";
+    note "The newly created ticket id = $id";
 }
 {
     my $t =
-      Net::Redmine::Ticket->load( connection => $r->connection, id => $id );
+      Net::RedmineRest::Ticket->load( connection => $r->connection, id => $id );
 
     is $t->status(), "Closed";
 }

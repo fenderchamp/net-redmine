@@ -2,6 +2,7 @@ package Net::RedmineRest::Connection;
 use Moo;
 use URI;
 use Params::Validate;
+use Net::RedmineRest::IssueStatuses;
 
 has url =>      ( is => "rw",  required => 1 );
 has user     => ( is => "rw",  required => 1 );
@@ -11,17 +12,24 @@ has apikey   => ( is => "rw",  required => 0 );
 has is_logined => ( is => "rw");
 has is_rest    => ( is => "rw");
 
-has _live_ticket_objects => ( is => "rw", lazy=>1, builder => 1);
-
-
-has project => ( is => "rw", lazy => 1, builder => 1);
 has base_url => ( is => "rw", lazy => 1, builder => 1);
+has issue_statuses => ( is => "rw", lazy =>1, builder =>1);
 has mechanize => ( is => "rw", lazy => 1, builder => 1);
+has project => ( is => "rw", lazy => 1, builder => 1);
 has rest => ( is => "rw", lazy => 1, builder => 1);
+
+has _live_ticket_objects => ( is => "rw", lazy=>1, builder => 1);
 
 use WWW::Mechanize;
 use REST::Client;
 use JSON;
+
+sub _build_issue_statuses {
+   my ($self)=@_;
+   return Net::RedmineRest::IssueStatuses->load(
+      connection=>$self
+   );
+}
 
 sub _build__live_ticket_objects { return {} };
 
