@@ -13,8 +13,6 @@ ok(scalar @{$is->issue_statuses},'some statuses loaded');
 
 my $one=$is->issue_statuses->[0];
 
-
-$DB::single=1;
 isa_ok ($is->fetch(id=>$one->{id}),'HASH');
 isa_ok ($is->fetch(name=>$one->{name}),'HASH');
 
