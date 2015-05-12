@@ -3,6 +3,7 @@ use Moo;
 our $VERSION = '0.09';
 use Net::RedmineRest::Connection;
 use Net::RedmineRest::Issue;
+use Net::RedmineRest::IssueStatuses;
 use Net::RedmineRest::Project;
 use Net::RedmineRest::ProjectList;
 use Net::RedmineRest::User;
@@ -87,6 +88,11 @@ sub load_projects {
     my ($self, %args) = @_;
     my $project_list=Net::RedmineRest::ProjectList->load(connection => $self->connection, %args);
     return $project_list->projects;
+}
+
+sub load_issue_statuses {
+    my ($self, %args) = @_;
+    return Net::RedmineRest::IssueStatuses->load(connection => $self->connection, %args);
 }
 
 sub lookup_project {
