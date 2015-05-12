@@ -137,7 +137,6 @@ sub destroy {
     my ($code,$content)=$c->DELETE($service_url);
     $self->response_code($code);
     if ( $code == 200 ) {
-      $self->status('DELETED');
       $self->clean_cache() if ($self->can('clean_cache') );
     } 
 }
