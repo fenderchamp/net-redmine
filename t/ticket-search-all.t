@@ -7,7 +7,7 @@ use Net::RedmineRest::Search;
 use Test::Cukes;
 
 require 't/net_redmine_rest_test.pl';
-my $r = new_net_redmine();
+
 my $search;
 my @tickets;
 
@@ -24,7 +24,8 @@ my $test_project;
     );
 
 my $r=$test_project->r;
-my $n = int(rand(10)) + 3;
+#my $n = int(rand(10)) + 3;
+my $n = 2; 
 
 Given qr/^that there are $n tickets in the system$/, sub {
     @tickets = new_tickets($r, $n);
@@ -42,6 +43,7 @@ Then qr/^all tickets should be found\.$/, sub {
 
     diag("The total number of tickets is " . scalar(@found));
 
+$DB::single=1;
     my @ticket_ids = map { $_->id } @tickets;
     my @found_ids  = map { $_->id } @found;
 

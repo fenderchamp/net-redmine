@@ -43,7 +43,6 @@ sub _provide_data {
 
     my $content;
     $content->{project}=$project;
-
     return $content;
 
 }
@@ -73,11 +72,15 @@ sub refresh_from_json {
    } 
 }
 
-
 sub has_required_load_args {
-    my ($self, %attr) = @_;
-    die "need specify id or identifier when loading it." unless defined $attr{id} || $attr{identifier};
-    my $id = ($attr{id} || $attr{identifier});
+   my ($self, %attr) = @_;
+   my $id = ($attr{id} || $attr{identifier});
+   unless ( $id ) {
+      if ( $attr{connection} ) {
+         $id=$attr{connection}->project;  
+      }
+    }  
+    die "need id or identifier, or set project on connection when loading project." unless $id;
     return {id=>$id};
 }
 
