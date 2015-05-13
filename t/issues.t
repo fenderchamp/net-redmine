@@ -53,12 +53,10 @@ ok ($issue->id =~ /^\d+$/,'id is numeric');
 # Given that this test doesn't run overnight.
 is($issue->created_at->ymd, DateTime->now->ymd, 'date as expected');
 
-$DB::single=1;
 my $issue2 = Net::RedmineRest::Issue->load(
     connection => $r->connection,
     id => $issue->id
 );
-$DB::single=1;
 
 is($issue2->id, $issue->id,'issue ids match');
 is($issue2->subject, $issue->subject,'issue subjects match');

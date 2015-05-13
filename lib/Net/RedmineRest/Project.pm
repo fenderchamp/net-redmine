@@ -15,6 +15,7 @@ has  parent_id => ( is=>"rw" ); #the parent project number
 has  created_on => ( is=>"rw" ); 
 has  updated_on => ( is=>"rw" ); 
 has  status => ( is=>"rw" ); 
+has  issue_list => ( is=>"rw",lazy=>1,builder=>1 ); 
 
 has  inherit_members => ( is=>"rw" ); #true or false
 has  tracker_ids => ( is=>"rw",default => sub { return [] } ); #(repeatable element) the tracker id: 1 for Bug, etc.
@@ -22,7 +23,6 @@ has  enabled_module_names => ( is=>"rw" ); #(repeatable element) the module name
   
 has id          => (is => "rw");
 has json        => (is => "rw");
-
 
 sub _provide_data {
 
@@ -47,6 +47,16 @@ sub _provide_data {
     return $content;
 
 }
+
+sub _build_issue_list {
+   my ($self,%args)=@_;
+    return Net::RedmineRest::IssueList->load(
+        project_id=>$self->id,
+        connection=>$self->connection
+    );
+
+}
+
 
 sub refresh_from_json {
 

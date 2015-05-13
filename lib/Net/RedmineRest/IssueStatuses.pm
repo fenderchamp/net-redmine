@@ -39,7 +39,6 @@ sub fetch {
     my $name = $args{name};
     return {} unless ( $id || $name );
     my $subscript;
-$DB::single=1;
     if ( $name ) {
         $name=lc($name);
         $subscript=$self->_by_name()->{$name};
