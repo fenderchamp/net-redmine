@@ -16,7 +16,6 @@ sub _build_service {
 sub _process_response {
     my ($self,$code,$content)=@_;
     if ( $code == 200 ) {
-      $DB::single=1;	
       return $self;
     }
     return undef;

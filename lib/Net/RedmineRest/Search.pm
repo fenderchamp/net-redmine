@@ -4,6 +4,8 @@ use pQuery;
 use Net::RedmineRest::Ticket;
 use Text::CSV::Slurp;
 use IO::String;
+use Net::RedmineRest::Base;
+extends 'Net::RedmineRest::Base';
 
 has connection => (
     is => "rw",
@@ -14,11 +16,12 @@ has query => (is => "rw", required => 1);
 has type => (is => "rw", required => 1);
 
 sub results {
-    my $self = shift;
+    my ($self) = @_;
 
     unless (defined($self->query)) {
         return $self->all_tickets;
     }
+    $self->force_mechanize();
 
     my $mech = $self->connection->get_project_overview->mechanize;
     $mech->form_number(1);
@@ -45,6 +48,7 @@ sub results {
 
 sub all_tickets {
     my ($self) = @_;
+
     my $mech = $self->connection->get_issues_page->mechanize;
 
     unless ($mech->follow_link(text => "CSV")) {

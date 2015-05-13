@@ -1,19 +1,25 @@
 package Net::RedmineRest::Base;
 use Moo;
 
-has response_code  => (is => "rw");
-has service => ( is=>"rw",lazy=>1,builder=>1);
 
 has connection => (
     is => "rw",
     required => 1,
-    weak_ref => 1,
+    weak_ref => 1
 );
+
 has json        => (is => "rw");
+has response_code  => (is => "rw");
+has service => ( is=>"rw",lazy=>1,builder=>1);
 
 sub _build_service {
     my ($self) = @_;
     return $self->entity.'s';  #the project name
+}
+
+sub force_mechanize {
+    my ($self) = @_;
+    $self->connection->mech_login();
 }
 
 sub save {

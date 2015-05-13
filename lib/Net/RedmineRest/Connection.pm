@@ -11,6 +11,7 @@ has apikey   => ( is => "rw",  required => 0 );
 
 has is_logined => ( is => "rw");
 has is_rest    => ( is => "rw");
+has is_mech    => ( is => "rw");
 
 has base_url => ( is => "rw", lazy => 1, builder => 1);
 has issue_statuses => ( is => "rw", lazy =>1, builder =>1);
@@ -164,15 +165,22 @@ sub get_login_page {
     return $self;
 }
 
-sub assert_login {
-    my $self = shift;
-    return 1 if $self->is_logined;
-    if ( $self->working_rest_connection ) {
-        $self->is_rest(1);
-        $self->is_logined(1);
-        return 1; 
-    }
 
+sub assert_login {
+    my ($self) = @_;
+    return 1 if ( $self->is_logined && $self->is_rest );
+    if ( $self->working_rest_connection ) {
+            $self->is_rest(1);
+            $self->is_logined(1);
+            return 1; 
+    }
+    return $self->mech_login()
+}
+
+sub mech_login {
+
+    my ($self) = @_;
+    return 1 if ( $self->is_logined && $self->is_mech() );
     my $mech = $self->get_login_page->mechanize;
     my $form_n = 0;
     my @forms = $mech->forms;
@@ -198,14 +206,15 @@ sub assert_login {
     if ( $d_c =~ /<div class="flash error"/ ) {
         die "Can't login, invalid login or password !";
     }
+    $self->is_mech(1);
     $self->is_logined(1);
     return 1;
 
 }
 
 sub get_project_overview {
-    my ($self,$project) = @_;
-    $self->assert_login;
+    my ($self,%args) = @_;
+    $self->assert_login();
 
     $self->mechanize->get( $self->url );
     return $self;

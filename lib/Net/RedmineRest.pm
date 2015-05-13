@@ -7,7 +7,7 @@ use Net::RedmineRest::IssueStatuses;
 use Net::RedmineRest::Project;
 use Net::RedmineRest::ProjectList;
 use Net::RedmineRest::User;
-use Net::Redmine::Search;
+use Net::RedmineRest::Search;
 
 has connection => (
     is => "rwp",
@@ -109,12 +109,10 @@ sub lookup_ticket {
     }
 }
 
-
-
 sub search_ticket {
     my ($self, $query) = @_;
 
-    my $search = Net::Redmine::Search->new(
+    my $search = Net::RedmineRest::Search->new(
         connection => $self->connection,
         type => ['ticket'],
         query => $query
