@@ -56,6 +56,12 @@ has subject      => ( is => "rw" );
 has tracker      => ( is => "rw" );
 has updated_on   => ( is => "rw" );
 
+has watcher_user => ( is => "rw" )
+  ;    #- Array of user ids to add as watchers (since 2.3.0)
+
+has json => ( is => "rw" );
+
+
 sub status {
    my ($self,$value)=@_;
 
@@ -69,11 +75,6 @@ sub status {
         )
    );
 }
-
-has watcher_user => ( is => "rw" )
-  ;    #- Array of user ids to add as watchers (since 2.3.0)
-
-has json => ( is => "rw" );
 
 sub cache {
     my ($self) = (@_);
@@ -184,6 +185,7 @@ sub _provide_data {
 
 }
 
+
 sub refresh_from_json {
 
     my ( $self, %args ) = @_;
@@ -258,6 +260,13 @@ sub _build_histories {
               )
         } ( 0 .. $n )
     ];
+}
+
+sub has_required_load_args {
+    my ($self, %attr) = @_;
+    die "need specify id." unless defined $attr{id};
+    my $id = $attr{id};
+    return {id=>$id};
 }
 
 __PACKAGE__->meta->make_immutable;

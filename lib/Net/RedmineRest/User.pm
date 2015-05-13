@@ -92,6 +92,13 @@ sub refresh_from_json {
    
 }
 
+sub has_required_load_args {
+    my ($self, %attr) = @_;
+    die "need specify id." unless defined $attr{id};
+    my $id = $attr{id};
+    return {id=>$id};
+}
+
 __PACKAGE__->meta->make_immutable;
 1;
 

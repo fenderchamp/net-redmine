@@ -76,10 +76,6 @@ sub save    { return undef }
 sub create  { return undef }
 sub destroy { return undef }
 
-sub _has_required_load_args {
-      return {};
-}
-
 __PACKAGE__->meta->make_immutable;
 1;
 

@@ -1,15 +1,29 @@
 #!/usr/bin/env perl -w
 use strict;
-use Test::Cukes;
+use Test::Project;
 use Quantum::Superpositions;
 use Net::Redmine;
-use Net::Redmine::Search;
+use Net::RedmineRest::Search;
+use Test::Cukes;
 
-require 't/net_redmine_test.pl';
+require 't/net_redmine_rest_test.pl';
 my $r = new_net_redmine();
 my $search;
 my @tickets;
 
+my $test_project;
+
+    my ( $identifier, $name, $description, $homepage ) = project_test_data();
+    $test_project = Test::Project->new(
+        r           => new_net_redmine(),
+        identifier  => $identifier,
+        name        => $name,
+        description => $description,
+        homepage    => $homepage,
+        initialize  => 1
+    );
+
+my $r=$test_project->r;
 my $n = int(rand(10)) + 3;
 
 Given qr/^that there are $n tickets in the system$/, sub {
@@ -34,6 +48,7 @@ Then qr/^all tickets should be found\.$/, sub {
     assert(all(@ticket_ids) == any(@found_ids));
 
     $_->destroy for @tickets;
+    $test_project->scrub_project_if_exists();
 };
 
 runtests <<FEATURE;

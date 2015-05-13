@@ -65,15 +65,22 @@ sub create {
       $self->_refresh();
       return $self;
     }  
+}
 
+sub load_from_json {
+    my ($class, %attr) = @_;
+    return undef unless ($attr{json} && $attr{connection} ); 
+    my $self = $class->new(%attr);
+    $self->refresh_from_json;
+    return $self;
 }
 
 sub load {
     my ($class, %attr) = @_;
 
     my $args;
-    if ( $class->can('_has_required_load_args')) { 
-      $args=$class->_has_required_load_args(%attr);
+    if ( $class->can('has_required_load_args')) { 
+      $args=$class->has_required_load_args(%attr);
     }
 
     if ( $class->can('fetch_cache') ) {
@@ -94,13 +101,6 @@ sub _reload {
     my ($self)=@_;
     my $id=$self->id;
     $self->_process_response($self->_get(id=>$id));
-}
-
-sub _has_required_load_args {
-    my ($self, %attr) = @_;
-    die "need specify id or identifier when loading it." unless defined $attr{id} || $attr{identifier};
-    my $id = ($attr{id} || $attr{identifier});
-    return {id=>$id};
 }
 
 sub _refresh {

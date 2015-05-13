@@ -14,6 +14,7 @@ has name        => ( is => 'rw' );
 has description => ( is => 'rw' );
 has homepage    => ( is => 'rw' );
 has initialize  => ( is =>'ro');
+has id           => ( is =>'rw');
 
 sub BUILD {
     my $self = shift;
@@ -101,6 +102,7 @@ sub data_initialize {
 	my $p=$self->create_project_and_verify_its_there();		
 	my $url=$self->r->connection->{url}.'/projects/'.$self->identifier;
    $self->r->reset_connection(url=>$url);
+   $self->id($p->id);
 
 }
 

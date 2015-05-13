@@ -15,7 +15,7 @@ has  parent_id => ( is=>"rw" ); #the parent project number
 has  created_on => ( is=>"rw" ); 
 has  updated_on => ( is=>"rw" ); 
 has  status => ( is=>"rw" ); 
-has  issue_list => ( is=>"rw",lazy=>1,builder=>1 ); 
+has  issues => ( is=>"rw",lazy=>1,builder=>1 ); 
 
 has  inherit_members => ( is=>"rw" ); #true or false
 has  tracker_ids => ( is=>"rw",default => sub { return [] } ); #(repeatable element) the tracker id: 1 for Bug, etc.
@@ -48,13 +48,12 @@ sub _provide_data {
 
 }
 
-sub _build_issue_list {
+sub _build_issues {
    my ($self,%args)=@_;
-    return Net::RedmineRest::IssueList->load(
+   return Net::RedmineRest::IssueList->load(
         project_id=>$self->id,
         connection=>$self->connection
-    );
-
+   );
 }
 
 
@@ -74,6 +73,13 @@ sub refresh_from_json {
    } 
 }
 
+
+sub has_required_load_args {
+    my ($self, %attr) = @_;
+    die "need specify id or identifier when loading it." unless defined $attr{id} || $attr{identifier};
+    my $id = ($attr{id} || $attr{identifier});
+    return {id=>$id};
+}
 
 __PACKAGE__->meta->make_immutable;
 1;
