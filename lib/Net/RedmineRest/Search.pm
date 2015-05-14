@@ -49,12 +49,11 @@ sub results {
 sub all_tickets {
     my ($self) = @_;
 
-    if ( $self->connection->is_rest) {
-      my $project=Net::RedmineRest::Project->load(
+$DB::single=1;
+    my $project=Net::RedmineRest::Project->load(
          connection=>$self->connection
-      );
-      return $project->issues if ($project)
-    }
+    );
+    return @{$project->issues} if ($project);
 
     $self->force_mechanize();
     my $mech = $self->connection->get_issues_page->mechanize;

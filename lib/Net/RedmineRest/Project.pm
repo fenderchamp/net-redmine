@@ -1,5 +1,6 @@
 package Net::RedmineRest::Project;
 use Moo;
+use Net::RedmineRest::IssueList;
 use Net::RedmineRest::Base;
 extends 'Net::RedmineRest::Base';
 
@@ -16,6 +17,7 @@ has  created_on => ( is=>"rw" );
 has  updated_on => ( is=>"rw" ); 
 has  status => ( is=>"rw" ); 
 has  issues => ( is=>"rw",lazy=>1,builder=>1 ); 
+has  _issue_list => ( is=>"rw",lazy=>1,builder=>1 ); 
 
 has  inherit_members => ( is=>"rw" ); #true or false
 has  tracker_ids => ( is=>"rw",default => sub { return [] } ); #(repeatable element) the tracker id: 1 for Bug, etc.
@@ -47,12 +49,17 @@ sub _provide_data {
 
 }
 
-sub _build_issues {
+sub _build__issue_list {
    my ($self,%args)=@_;
    return Net::RedmineRest::IssueList->load(
         project_id=>$self->id,
         connection=>$self->connection
    );
+}
+
+sub _build_issues {
+   my ($self,%args)=@_;
+   return $self->_issue_list->issues();
 }
 
 
