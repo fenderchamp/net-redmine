@@ -27,11 +27,9 @@ sub create {
     my $self = $class->new(%attr);
 
     my $mech = $self->connection->get_new_issue_page()->mechanize;
-
     $mech->form_id("issue-form");
     $mech->field("issue[subject]" => $self->subject);
     $mech->field("issue[description]" => $self->description);
-$DB::single=1;
     $mech->submit;
 
     unless ($mech->response->is_success) {
@@ -74,7 +72,6 @@ sub refresh {
     eval '$self->connection->get_issues_page($id)';
     if ($@) { warn $@; return }
 
-$DB::single=1;
     my $p = pQuery($self->connection->mechanize->content);
     my $wc = new HTML::WikiConverter( dialect => 'Markdown' );
     my $description = $wc->html2wiki( Encode::encode_utf8($p->find(".issue .wiki")->html) );

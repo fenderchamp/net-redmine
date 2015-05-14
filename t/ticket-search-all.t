@@ -43,7 +43,6 @@ Then qr/^all tickets should be found\.$/, sub {
 
     diag("The total number of tickets is " . scalar(@found));
 
-$DB::single=1;
     my @ticket_ids = map { $_->id } @tickets;
     my @found_ids  = map { $_->id } @found;
 

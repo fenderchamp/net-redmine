@@ -49,7 +49,6 @@ sub results {
 sub all_tickets {
     my ($self) = @_;
 
-$DB::single=1;
     my $project=Net::RedmineRest::Project->load(
          connection=>$self->connection
     );
