@@ -1,6 +1,6 @@
 #!/usr/bin/env perl -w
 use strict;
-use Net::RedmineRest;
+use Net::Redmine;
 use Test::Project;
 
 use Test::Memory::Cycle;

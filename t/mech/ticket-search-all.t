@@ -2,7 +2,7 @@
 use strict;
 use Test::Cukes;
 use Quantum::Superpositions;
-use Net::RedmineRest;
+use Net::Redmine;
 use Net::Redmine::Mech::Search;
 
 require 't/net_redmine_test.pl';

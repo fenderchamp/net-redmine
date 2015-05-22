@@ -1,7 +1,7 @@
 #!/usr/bin/env perl -w
 use strict;
 use Test::Cukes;
-use Net::RedmineRest;
+use Net::Redmine;
 use URI;
 
 my ($r, $c);
@@ -14,37 +14,37 @@ my ($user, $password, $apikey) = ('net-redmine-unit-tests', 'net-redmine-unit-te
 
 Given qr/an redmine object with a clean url and a project/ => sub {
     my $url = "http://netredmine.m.redmine.org";
-    $r = Net::RedmineRest->new(project=>'test', url => $url, user => $user, password => $password);
+    $r = Net::Redmine->new(project=>'test', url => $url, user => $user, password => $password);
     $c = $r->connection;
-    assert $c->isa("Net::RedmineRest::Connection");
+    assert $c->isa("Net::Redmine::Connection");
 };
 
 Given qr/an redmine object with a project bound url/ => sub {
     my $url = "http://netredmine.m.redmine.org/projects/test";
-    $r = Net::RedmineRest->new(url => $url, user => $user, password => $password, apikey => $apikey);
+    $r = Net::Redmine->new(url => $url, user => $user, password => $password, apikey => $apikey);
     $c = $r->connection;
-    assert $c->isa("Net::RedmineRest::Connection");
+    assert $c->isa("Net::Redmine::Connection");
 };
 
 Given qr/an redmine wo apikey object with a plain url/ => sub {
     my $url = 'http://netredmine.m.redmine.org';
-    $r = Net::RedmineRest->new(url => $url,user => $user, password => $password);
+    $r = Net::Redmine->new(url => $url,user => $user, password => $password);
     $c = $r->connection;
-    assert $c->isa("Net::RedmineRest::Connection");
+    assert $c->isa("Net::Redmine::Connection");
 };
 
 Given qr/an redmine object with a plain url/ => sub {
     my $url = 'http://netredmine.m.redmine.org';
-    $r = Net::RedmineRest->new(url => $url,user => $user, password => $password, apikey => $apikey);
+    $r = Net::Redmine->new(url => $url,user => $user, password => $password, apikey => $apikey);
     $c = $r->connection;
-    assert $c->isa("Net::RedmineRest::Connection");
+    assert $c->isa("Net::Redmine::Connection");
 };
 
 Given qr/an redmine object with a port too and project bound url/ => sub {
     my $url = "http://nonesuch.nothing.com:1234/projects/test";
-    $r = Net::RedmineRest->new(url => $url, user => $user, password => $password, apikey => $apikey);
+    $r = Net::Redmine->new(url => $url, user => $user, password => $password, apikey => $apikey);
     $c = $r->connection;
-    assert $c->isa("Net::RedmineRest::Connection");
+    assert $c->isa("Net::Redmine::Connection");
 };
 
 
@@ -100,8 +100,8 @@ runtests;
 #    And it should be logined
 
 __END__
-Feature: Net::RedmineRest::Connection class
-  Describe the features provided by Net::RedmineRest::Connection class
+Feature: Net::Redmine::Connection class
+  Describe the features provided by Net::Redmine::Connection class
 
   Scenario: test the connection info
     Given an redmine object with a plain url 1

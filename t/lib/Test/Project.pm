@@ -2,8 +2,8 @@ package Test::Project;
 
 use strict;
 use Test::More qw(no_plan);
-use Net::RedmineRest;
-use Net::RedmineRest::Project;
+use Net::Redmine;
+use Net::Redmine::Project;
 use Moo;
 
 has r           => ( is       => 'rw',
@@ -26,7 +26,7 @@ sub scrub_project_if_exists {
 
     my ($self) = @_;
     note 'delete the project if it exists (it probably shouldnt but whattever)';
-    my $project = Net::RedmineRest::Project->load(
+    my $project = Net::Redmine::Project->load(
         connection => $self->r->connection,
         identifier => $self->identifier,
     );
@@ -35,7 +35,7 @@ sub scrub_project_if_exists {
     note 'confirm that it be gone';
     undef($project);
 
-    $project = Net::RedmineRest::Project->load(
+    $project = Net::Redmine::Project->load(
         connection => $self->r->connection,
         identifier => $self->identifier
     );
@@ -47,7 +47,7 @@ sub create_project_and_verify_its_there {
 
     my ($self) = @_;
     note 'create it';
-    my $project = Net::RedmineRest::Project->create(
+    my $project = Net::Redmine::Project->create(
         connection  => $self->r->connection,
         identifier  => $self->identifier,
         name        => $self->name,
@@ -62,7 +62,7 @@ sub create_project_and_verify_its_there {
     my $id = $project->id;
     undef($project);
     note 'confirm that it be there load it by id';
-    $project = Net::RedmineRest::Project->load(
+    $project = Net::Redmine::Project->load(
         connection => $self->r->connection,
         id         => $id
     );
@@ -72,7 +72,7 @@ sub create_project_and_verify_its_there {
     undef($project);
 
     note 'confirm that it be there';
-    $project = Net::RedmineRest::Project->load(
+    $project = Net::Redmine::Project->load(
         connection => $self->r->connection,
         identifier => $self->identifier
     );

@@ -1,4 +1,4 @@
-package Net::RedmineRest::Base;
+package Net::Redmine::Base;
 use Moo;
 
 
@@ -208,7 +208,7 @@ __END__
 
 =head1 NAME
 
-Net::RedmineRest::Project - Represents a project.
+Net::Redmine::Project - Represents a project.
 
 =head1 SYNOPSIS
 

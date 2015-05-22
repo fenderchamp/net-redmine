@@ -1,15 +1,15 @@
-package Net::RedmineRest::Issue;
+package Net::Redmine::Issue;
 use Moo;
-use Net::RedmineRest::Project;
-use Net::RedmineRest::Simple;
-use Net::RedmineRest::TicketHistory;
+use Net::Redmine::Project;
+use Net::Redmine::Simple;
+use Net::Redmine::TicketHistory;
 use Net::Redmine::Mech::Ticket;
-use Net::RedmineRest::User;
+use Net::Redmine::User;
 
 use DateTimeX::Easy;
 
-use Net::RedmineRest::Base;
-extends 'Net::RedmineRest::Base';
+use Net::Redmine::Base;
+extends 'Net::Redmine::Base';
 
 my $ENTITY = 'issue';
 
@@ -74,7 +74,7 @@ sub status {
    my $stored_status=$self->connection->issue_statuses->fetch(name=>$value);
 
    $self->issue_status(
-        Net::RedmineRest::Simple->new(
+        Net::Redmine::Simple->new(
             id   => $stored_status->{id},
             name => $stored_status->{name}
         )
@@ -123,7 +123,7 @@ sub _build_created_at {
 sub _build_project {
     my ($self) = @_;
     if ( $self->connection->project ) {
-        return Net::RedmineRest::Project->load(
+        return Net::Redmine::Project->load(
             connection => $self->connection,
             identifier => $self->connection->project
         );
@@ -209,37 +209,37 @@ sub refresh_from_json {
 
     $self->notes( $json->{notes} );
     $self->project(
-        Net::RedmineRest::Project->load(
+        Net::Redmine::Project->load(
             connection => $self->connection,
             id         => $json->{project}->{id}
         )
     );
     $self->tracker(
-        Net::RedmineRest::Simple->new(
+        Net::Redmine::Simple->new(
             id   => $json->{tracker}->{id},
             name => $json->{tracker}->{name}
         )
     );
     $self->issue_status(
-        Net::RedmineRest::Simple->new(
+        Net::Redmine::Simple->new(
             id   => $json->{status}->{id},
             name => $json->{status}->{name}
         )
     );
     $self->priority(
-        Net::RedmineRest::Simple->new(
+        Net::Redmine::Simple->new(
             id   => $json->{priority}->{id},
             name => $json->{priority}->{name}
         )
     );
     $self->author(
-        Net::RedmineRest::User->load(
+        Net::Redmine::User->load(
             connection => $self->connection,
             id         => $json->{author}->{id}
         )
     );
     $self->assigned_to(
-        Net::RedmineRest::Simple->new(
+        Net::Redmine::Simple->new(
             id   => $json->{assigned_to}->{id},
             name => $json->{assigned_to}->{name}
         )
@@ -258,7 +258,7 @@ sub _build_histories {
 
     return [
         map {
-            Net::RedmineRest::TicketHistory->new(
+            Net::Redmine::TicketHistory->new(
                 connection => $self->connection,
                 id         => $_,
                 ticket     => $self
@@ -281,7 +281,7 @@ __END__
 
 =head1 NAME
 
-Net::RedmineRest::Issue - Represents a issue.
+Net::Redmine::Issue - Represents a issue.
 
 =head1 SYNOPSIS
 

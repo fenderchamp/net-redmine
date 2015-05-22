@@ -1,33 +1,58 @@
 package Net::Redmine;
-use Any::Moose;
+use Moo;
 our $VERSION = '0.09';
 use Net::Redmine::Connection;
-use Net::Redmine::Ticket;
-use Net::Redmine::Search;
+use Net::Redmine::Issue;
+use Net::Redmine::IssueStatuses;
+use Net::Redmine::Project;
+use Net::Redmine::ProjectList;
 use Net::Redmine::User;
+use Net::Redmine::Search;
 
 has connection => (
-    is => "ro",
-    isa => "Net::Redmine::Connection",
+    is => "rwp",
     required => 1
 );
 
 sub BUILDARGS {
     my $class = shift;
     my %args = @_;
-
     $args{connection} = Net::Redmine::Connection->new(
         url      => delete $args{url},
         user     => delete $args{user},
-        password => delete $args{password}
+        password => delete $args{password},
+        apikey => delete $args{apikey}
     );
+
+    if ( $args{project} ) {
+        $args{connection}->project($args{project}); 
+        delete $args{project}; 
+    }
 
     return $class->SUPER::BUILDARGS(%args);
 }
 
+sub reset_connection {
+
+   my ($self,%args)=@_;
+
+   my $url=($args{url} || $self->connection->url);
+   my $user=($args{user} || $self->connection->user);
+   my $password=($args{password} || $self->connection->password);
+   my $apikey=($args{apikey} || $self->connection->apikey);
+    $self->_set_connection ( Net::Redmine::Connection->new(
+        url      => $url, 
+        user     => $user,
+        password => $password,
+        apikey =>  $apikey
+      )
+   );
+
+}
+
 sub create {
     my ($self, %args) = @_;
-    return $self->create_ticket(%$_) if $_ = $args{ticket};
+    return $self->create_ticket(%{$args{ticket}}) if $args{ticket};
 }
 
 sub copy {
@@ -45,25 +70,42 @@ sub copy {
 
 sub lookup {
     my ($self, %args) = @_;
+    return $self->lookup_project(%$_) if $_ = $args{project};
     return $self->lookup_ticket(%$_) if $_ = $args{ticket};
     return $self->lookup_user(%$_) if $_ = $args{user};
 }
 
 sub create_ticket {
     my ($self, %args) = @_;
-    my $t = Net::Redmine::Ticket->create(
+    my $t = Net::Redmine::Issue->create(
         connection => $self->connection,
         %args
     );
-
     return $self->lookup_ticket(id => $t->id);
+}
+
+sub load_projects {
+    my ($self, %args) = @_;
+    my $project_list=Net::Redmine::ProjectList->load(connection => $self->connection, %args);
+    return $project_list->projects;
+}
+
+sub load_issue_statuses {
+    my ($self, %args) = @_;
+    return Net::Redmine::IssueStatuses->load(connection => $self->connection, %args);
+}
+
+sub lookup_project {
+    my ($self, %args) = @_;
+    if ($args{id} || $args{identifier} ) {
+        return Net::Redmine::Project->load(connection => $self->connection, %args);
+    }
 }
 
 sub lookup_ticket {
     my ($self, %args) = @_;
-
-    if (my $id = $args{id}) {
-        return Net::Redmine::Ticket->load(connection => $self->connection, id => $id);
+    if (my $id = $args{id} ) {
+        return Net::Redmine::Issue->load(connection => $self->connection, id => $id);
     }
 }
 
@@ -163,7 +205,7 @@ contain C<subject> and <description> of the ticket. For example:
         description => "Found a bug in the bag"
     });
 
-The returned value of this method is a C<Net::Redmine::Ticket> object.
+The returned value of this method is a C<Net::Redmine::Issue> object.
 Also read the document of that class to see how to use it.
 
 =item copy( ticket => {id => Integer, ... } }
@@ -175,7 +217,7 @@ key is the same hasref as for C<create>.
 =item lookup( ticket => { id => Integer } }
 
 Given a ticket id, this instance method load the ticket content from
-the server, it also returns a C<Net::Redmine::Ticket> object.
+the server, it also returns a C<Net::Redmine::Issue> object.
 
 At this point, only C<id> can be specified.
 

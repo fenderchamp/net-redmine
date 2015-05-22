@@ -1,6 +1,6 @@
 #!/usr/bin/env perl -w
 use strict;
-use Net::RedmineRest;
+use Net::Redmine;
 use Test::Project;
 
 require 't/net_redmine_rest_test.pl';
@@ -24,7 +24,7 @@ my $id = $ticket->id;
 
 $ticket->destroy;
 
-my $t2 = Net::RedmineRest::Issue->load(connection => $r->connection, id => $id);
+my $t2 = Net::Redmine::Issue->load(connection => $r->connection, id => $id);
 
 is($t2, undef, "loading a deleted ticket should return undef.");
 $test_project->scrub_project_if_exists;

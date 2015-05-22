@@ -1,8 +1,8 @@
-package Net::RedmineRest::IssueList;
+package Net::Redmine::IssueList;
 use Moo;
-use Net::RedmineRest::Issue;
-use Net::RedmineRest::Base;
-extends 'Net::RedmineRest::Base';
+use Net::Redmine::Issue;
+use Net::Redmine::Base;
+extends 'Net::Redmine::Base';
 
 my $SERVICE_NAME='issues';
 has  entity     => ( is=>"rw",default=>${SERVICE_NAME});
@@ -31,7 +31,7 @@ sub _process_response {
     my $issues;
     if ( $code == 200 ) {
       foreach my $json (@{$content->{$self->entity}}) {
-         my $issue=Net::RedmineRest::Issue->load_from_json (
+         my $issue=Net::Redmine::Issue->load_from_json (
             connection=>$self->connection,
             json=>$json
          );
@@ -56,7 +56,7 @@ __END__
 
 =head1 NAME
 
-Net::RedmineRest::Project - Represents a project.
+Net::Redmine::Project - Represents a project.
 
 =head1 SYNOPSIS
 

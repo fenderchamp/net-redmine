@@ -6,7 +6,7 @@ use DateTimeX::Easy;
 
 has connection => (
     is => "rw",
-    isa => "Net::RedmineRest::Connection",
+    isa => "Net::Redmine::Connection",
     required => 1,
     weak_ref => 1,
 );

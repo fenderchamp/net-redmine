@@ -1,13 +1,13 @@
-package Net::Redmine::Search;
+package Net::Redmine::Mech::Search;
 use Any::Moose;
 use pQuery;
-use Net::RedmineRest::Ticket;
+use Net::Redmine::Ticket;
 use Text::CSV::Slurp;
 use IO::String;
 
 has connection => (
     is => "rw",
-    isa => "Net::RedmineRest::Connection",
+    isa => "Net::Redmine::Connection",
     required => 0
 );
 
@@ -16,7 +16,6 @@ has type => (is => "rw", isa => "ArrayRef", required => 1);
 
 sub results {
     my $self = shift;
-$DB::single=1;
 
     unless (defined($self->query)) {
         return $self->all_tickets;
@@ -36,7 +35,7 @@ $DB::single=1;
             sub {
                 my $issue_url = $_->getAttribute("href") or return;
                 if (my ($issue_id) = $issue_url =~ m[/issues/(\d+)$]) {
-                    push @r, Net::RedmineRest::Ticket->load(connection => $self->connection, id => $issue_id)
+                    push @r, Net::Redmine::Ticket->load(connection => $self->connection, id => $issue_id)
                 }
             }
         );
@@ -47,7 +46,6 @@ $DB::single=1;
 
 sub all_tickets {
     my ($self) = @_;
-$DB::single=1;
     my $mech = $self->connection->get_issues_page->mechanize;
 
     unless ($mech->follow_link(text => "CSV")) {
@@ -59,7 +57,7 @@ $DB::single=1;
     my $data = Text::CSV::Slurp->load(filehandle => $csv_io);
     my @r = ();
     foreach my $t (@$data) {
-        push @r, Net::RedmineRest::Ticket->load(connection => $self->connection, id => $t->{'#'});
+        push @r, Net::Redmine::Ticket->load(connection => $self->connection, id => $t->{'#'});
     }
 
     return wantarray ? @r : \@r;

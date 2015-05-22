@@ -1,8 +1,8 @@
 #!/usr/bin/env perl -w
 use strict;
 
-use Net::RedmineRest;
-use Net::RedmineRest::TicketHistory;
+use Net::Redmine;
+use Net::Redmine::TicketHistory;
 use Test::Project;
 use Regexp::Common;
 use Regexp::Common::Email::Address;
@@ -45,13 +45,13 @@ $t->save;
 
 {
     # The 0th history entry has a specially meaning of "ticket creation".
-    my $h = Net::RedmineRest::TicketHistory->new(
+    my $h = Net::Redmine::TicketHistory->new(
         connection => $r->connection,
         id => 0,
         ticket_id => $t->id
     );
 
-    isa_ok($h,'Net::RedmineRest::TicketHistory','th is a Net::RedmineRest::TicketHistory');
+    isa_ok($h,'Net::Redmine::TicketHistory','th is a Net::Redmine::TicketHistory');
 
     like ($h->author->email, qr/^$RE{Email}{Address}$/,'email is sane for author');
     is($h->date->ymd, DateTime->now->ymd, 'th 0 date as expected');
@@ -71,14 +71,14 @@ $t->save;
 }
 
 {
-    my $h = Net::RedmineRest::TicketHistory->new(
+    my $h = Net::Redmine::TicketHistory->new(
         connection => $r->connection,
         id => 1,
         ticket_id => $t->id
     );
 
 
-    isa_ok($h,'Net::RedmineRest::TicketHistory','th 1 is a Net::RedmineRest::TicketHistory');
+    isa_ok($h,'Net::Redmine::TicketHistory','th 1 is a Net::Redmine::TicketHistory');
     like ($h->author->email, qr/^$RE{Email}{Address}$/,'email 1 is sane for author');
     is($h->date->ymd, DateTime->now->ymd, 'th 1 date as expected');
     ok($h->can("journal"),'can journal');
@@ -99,7 +99,7 @@ $t->save;
 
 
 {
-    my $h = Net::RedmineRest::TicketHistory->new(
+    my $h = Net::Redmine::TicketHistory->new(
         connection => $r->connection,
         id => 2,
         ticket_id => $t->id
@@ -128,7 +128,7 @@ $t->save;
     is(0+@$histories, 3, "This ticket has three history entires");
 
     foreach my $h (@$histories) {
-        isa_ok($h,'Net::RedmineRest::TicketHistory','h is a Net::RedmineRest::TicketHistory');
+        isa_ok($h,'Net::Redmine::TicketHistory','h is a Net::Redmine::TicketHistory');
         ok($h->can("id"),"can id ". $h->id);
         like($h->author->email, qr/^$RE{Email}{Address}$/, "examine ticket author email");
     }

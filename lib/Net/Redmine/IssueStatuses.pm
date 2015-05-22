@@ -1,7 +1,7 @@
-package Net::RedmineRest::IssueStatuses;
+package Net::Redmine::IssueStatuses;
 use Moo;
-use Net::RedmineRest::Base;
-extends 'Net::RedmineRest::Base';
+use Net::Redmine::Base;
+extends 'Net::Redmine::Base';
 
 my $SERVICE_NAME = 'issue_statuses';
 has entity => ( is => "rw", default => ${SERVICE_NAME} );
@@ -83,7 +83,7 @@ __END__
 
 =head1 NAME
 
-Net::RedmineRest::Project - Represents a project.
+Net::Redmine::Project - Represents a project.
 
 =head1 SYNOPSIS
 

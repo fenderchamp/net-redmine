@@ -1,7 +1,7 @@
 #!/usr/bin/env perl -w
 use strict;
 use Test::More;
-use Net::RedmineRest;
+use Net::Redmine;
 use Regexp::Common;
 use Regexp::Common::Email::Address;
 

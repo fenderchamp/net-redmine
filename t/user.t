@@ -1,13 +1,13 @@
 #!/usr/bin/env perl -w
 use strict;
-use Net::RedmineRest;
-use Net::RedmineRest::User;
+use Net::Redmine;
+use Net::Redmine::User;
 use Test::More qw(no_plan);
 
 require 't/net_redmine_rest_test.pl';
 
 my $r = new_net_redmine();
-my $current_user = Net::RedmineRest::User->load(
+my $current_user = Net::Redmine::User->load(
     connection => $r->connection,
     id => 'current'
 );
@@ -18,7 +18,7 @@ ok($current_user->lastname,'current has lastname');
 ok($current_user->login,'current has login');
 ok($current_user->mail,'current has mail');
 
-my $new_user = Net::RedmineRest::User->create(
+my $new_user = Net::Redmine::User->create(
     connection => $r->connection,
     firstname => 'firstname',
     lastname => 'lastname',
@@ -34,7 +34,7 @@ ok($new_user->login,'new has login');
 ok($new_user->mail,'new has mail');
 ok($new_user->id,'new has id');
 
-my $loaded_user = Net::RedmineRest::User->load(
+my $loaded_user = Net::Redmine::User->load(
     connection => $r->connection,
     id => $new_user->id
 );
@@ -56,7 +56,7 @@ $DB::single=1;
 $loaded_user->destroy();
 undef($loaded_user);
 
-$loaded_user = Net::RedmineRest::User->load(
+$loaded_user = Net::Redmine::User->load(
     connection => $r->connection,
     id => $new_user->id
 );

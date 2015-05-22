@@ -3,7 +3,7 @@ use strict;
 use Test::More;
 use Net::Redmine;
 use Net::Redmine::Connection;
-use Net::Redmine::TicketHistory;
+use Net::Redmine::Mech::TicketHistory;
 
 my $page_html;
 {
@@ -12,7 +12,7 @@ my $page_html;
 }
 
 no warnings 'redefine';
-*Net::Redmine::TicketHistory::_build__ticket_page_html = sub {
+*Net::Redmine::Mech::TicketHistory::_build__ticket_page_html = sub {
     return $page_html;
 };
 use warnings;
@@ -23,7 +23,7 @@ my $conn = Net::Redmine::Connection->new(
     password => 'false'
 );
 
-my $history = Net::Redmine::TicketHistory->new(connection => $conn, id => 1, ticket_id => 1216);
+my $history = Net::Redmine::Mech::TicketHistory->new(connection => $conn, id => 1, ticket_id => 1216);
 
 plan tests => 1;
 is($history->date ."", "2009-06-07T04:05:00");

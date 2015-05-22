@@ -1,8 +1,8 @@
-package Net::RedmineRest::User;
+package Net::Redmine::User;
 use Moo;
 use DateTimeX::Easy;
-use Net::RedmineRest::Base;
-extends 'Net::RedmineRest::Base';
+use Net::Redmine::Base;
+extends 'Net::Redmine::Base';
 
 my $ENTITY='user';
 
@@ -107,7 +107,7 @@ __END__
 
 =head1 NAME
 
-Net::RedmineRest::User - Represents a user.
+Net::Redmine::User - Represents a user.
 
 =head1 SYNOPSIS
 #

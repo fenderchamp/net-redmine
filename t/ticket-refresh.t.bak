@@ -1,11 +1,7 @@
 #!/usr/bin/env perl -w
-
 use strict;
-
-use Test::Project;
-use Net::Redmine;
-use Net::Redmine::Ticket;
 use Test::More;
+use Net::Redmine;
 
 require 't/net_redmine_rest_test.pl';
 my ( $identifier, $name, $description, $homepage ) = project_test_data();
@@ -21,17 +17,16 @@ my $test_project = Test::Project->new(
 my ($ticket) = new_tickets( $test_project->r, 1 );
 my $id = $ticket->id;
 
-my $rr = new_net_redmine();
+my $rr  =new_net_redmine(),
 
-  my $ticket2 =
-  Net::Redmine::Ticket->load( connection => $rr->connection, id => $id );
+my $ticket2 = Net::Redmine::Ticket->load( connection => $rr->connection, id => $id );
 
 $ticket->description("bleh bleh bleh");
 $ticket->save;
 
 $ticket2->refresh;
 
+plan tests => 1;
 is( $ticket2->description, $ticket->description,
     "ticket content is refreshed" );
 
-$test_project->scrub_project_if_exists;

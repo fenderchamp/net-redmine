@@ -1,7 +1,7 @@
 use Test::More;
 use Cwd 'getcwd';
 
-use Net::RedmineRest;
+use Net::Redmine;
 
 
 END {
@@ -16,7 +16,7 @@ sub new_net_redmine {
 
    #$my ($server, $user, $password, $apikey) = ("http://netredmine.m.redmine.org", "net-redmine-unit-tests-admin", "net-redmine-unit-tests","e366da4adfe8d242891c59cbd70a912d8d875d88");
    my ($server, $user, $password, $apikey) = ("http://netredmine.m.redmine.org", "net-redmine-unit-tests", "net-redmine-unit-tests","7b7ae7e9f9aed7ffed823f55701bf745c119338c");
-   return Net::RedmineRest->new(url => $server,user => $user, password => $password, apikey => $apikey);
+   return Net::Redmine->new(url => $server,user => $user, password => $password, apikey => $apikey);
 
 }
 

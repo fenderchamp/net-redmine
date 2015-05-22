@@ -1,8 +1,8 @@
-package Net::RedmineRest::Connection;
+package Net::Redmine::Connection;
 use Moo;
 use URI;
 use Params::Validate;
-use Net::RedmineRest::IssueStatuses;
+use Net::Redmine::IssueStatuses;
 
 has url =>      ( is => "rw",  required => 1 );
 has user     => ( is => "rw",  required => 1 );
@@ -29,7 +29,7 @@ use JSON;
 
 sub _build_issue_statuses {
    my ($self)=@_;
-   return Net::RedmineRest::IssueStatuses->load(
+   return Net::Redmine::IssueStatuses->load(
       connection=>$self
    );
 }
@@ -313,19 +313,19 @@ __END__
 
 =head1 NAME
 
-Net::RedmineRest::Connection
+Net::Redmine::Connection
 
 =head1 SYNOPSIS
 
     # Initialize a redmine connection object
-    my $redmine = Net::RedmineRest::Connection->new(
+    my $redmine = Net::Redmine::Connection->new(
         url => 'http://redmine.example.com/projects/show/fooproject'
         user => 'hiro',
         password => 'yatta'
     );
 
     # Passed it to other classes
-    my $ticket = Net::RedmineRest::Ticket->new(connection => $redmine);
+    my $ticket = Net::Redmine::Ticket->new(connection => $redmine);
 
 =head1 DESCRIPTION
 

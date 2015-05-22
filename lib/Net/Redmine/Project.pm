@@ -1,8 +1,8 @@
-package Net::RedmineRest::Project;
+package Net::Redmine::Project;
 use Moo;
-use Net::RedmineRest::IssueList;
-use Net::RedmineRest::Base;
-extends 'Net::RedmineRest::Base';
+use Net::Redmine::IssueList;
+use Net::Redmine::Base;
+extends 'Net::Redmine::Base';
 
 my $SERVICE_NAME='project';
 has  entity => ( is=>"rw",default=>${SERVICE_NAME});
@@ -51,7 +51,7 @@ sub _provide_data {
 
 sub _build__issue_list {
    my ($self,%args)=@_;
-   return Net::RedmineRest::IssueList->load(
+   return Net::Redmine::IssueList->load(
         project_id=>$self->id,
         connection=>$self->connection
    );
@@ -98,7 +98,7 @@ __END__
 
 =head1 NAME
 
-Net::RedmineRest::Project - Represents a project.
+Net::Redmine::Project - Represents a project.
 
 =head1 SYNOPSIS
 

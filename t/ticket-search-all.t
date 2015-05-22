@@ -3,7 +3,7 @@ use strict;
 use Test::Project;
 use Quantum::Superpositions;
 use Net::Redmine;
-use Net::RedmineRest::Search;
+use Net::Redmine::Search;
 use Test::Cukes;
 
 require 't/net_redmine_rest_test.pl';

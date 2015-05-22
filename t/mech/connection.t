@@ -1,7 +1,7 @@
 #!/usr/bin/env perl -w
 use strict;
 use Test::Cukes;
-use Net::RedmineRest;
+use Net::Redmine;
 use URI;
 require 't/net_redmine_test.pl';
 
@@ -11,7 +11,7 @@ Given qr/an redmine object/ => sub {
     $r = new_net_redmine();
     $c = $r->connection;
 
-    assert $c->isa("Net::RedmineRest::Connection");
+    assert $c->isa("Net::Redmine::Connection");
 };
 
 When qr/invoke the "(.*)" method/ => sub {

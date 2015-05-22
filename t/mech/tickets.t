@@ -1,7 +1,7 @@
 #!/usr/bin/env perl -w
 use strict;
 use Test::More;
-use Net::RedmineRest;
+use Net::Redmine;
 use DateTime;
 
 require 't/net_redmine_test.pl';
@@ -14,7 +14,7 @@ note "Testing about Net::Redmine::Ticket class";
 my $subject = "Testing Net::Redmine $$ " . time;
 
 note "The newly created ticket id should looks sane";
-my $ticket = Net::RedmineRest::Ticket->create(
+my $ticket = Net::Redmine::Ticket->create(
     connection => $r->connection,
     subject => $subject,
     description => "testing. testing. testing."
@@ -26,7 +26,7 @@ $ticket->refresh;
 is $ticket->created_at->ymd, DateTime->now->ymd;
 
 note "Loading ticket content.";
-my $ticket2 = Net::RedmineRest::Ticket->load(
+my $ticket2 = Net::Redmine::Ticket->load(
     connection => $r->connection,
     id => $ticket->id
 );

@@ -1,6 +1,6 @@
 #!/usr/bin/env perl -w
 use strict;
-use Net::RedmineRest::Ticket;
+use Net::Redmine::Ticket;
 use Test::Project;
 use Test::More;
 use DateTime;
@@ -20,16 +20,16 @@ my $test_project = Test::Project->new(
     initialize  => 1
 );
 
-note "Testing about Net::RedmineRest::Ticket class";
+note "Testing about Net::Redmine::Ticket class";
 
-my $subject = "Testing Net::RedmineRest $$ " . time;
+my $subject = "Testing Net::Redmine $$ " . time;
 
 note "The newly created ticket id should looks sane";
 
 ok($r->connection->project(),'project found');
 is($r->connection->project(),$identifier,'project found');
 
-my $ticket = Net::RedmineRest::Ticket->create(
+my $ticket = Net::Redmine::Ticket->create(
     connection => $r->connection,
     subject => $subject,
     description => "testing. testing. testing."
@@ -41,7 +41,7 @@ $ticket->refresh;
 is $ticket->created_at->ymd, DateTime->now->ymd;
 
 note "Loading ticket content.";
-my $ticket2 = Net::RedmineRest::Ticket->load(
+my $ticket2 = Net::Redmine::Ticket->load(
     connection => $r->connection,
     id => $ticket->id
 );

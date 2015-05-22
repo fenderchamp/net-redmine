@@ -4,7 +4,7 @@ use Test::Cukes;
 use Regexp::Common;
 use Regexp::Common::Email::Address;
 
-use Net::RedmineRest;
+use Net::Redmine;
 require 't/net_redmine_test.pl';
 
 my $r = new_net_redmine();

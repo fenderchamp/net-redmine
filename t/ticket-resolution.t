@@ -1,8 +1,8 @@
 #!/usr/bin/env perl -w
 use strict;
 use Test::Project;
-use Net::RedmineRest;
-use Net::RedmineRest::Ticket;
+use Net::Redmine;
+use Net::Redmine::Ticket;
 use Test::More;
 
 require 't/net_redmine_rest_test.pl';
@@ -39,7 +39,7 @@ my $id;
 }
 {
     my $t =
-      Net::RedmineRest::Ticket->load( connection => $r->connection, id => $id );
+      Net::Redmine::Ticket->load( connection => $r->connection, id => $id );
 
     is $t->status(), "Closed";
 }

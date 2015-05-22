@@ -1,11 +1,11 @@
-package Net::RedmineRest::Search;
+package Net::Redmine::Search;
 use Moo;
 use pQuery;
-use Net::RedmineRest::Ticket;
+use Net::Redmine::Ticket;
 use Text::CSV::Slurp;
 use IO::String;
-use Net::RedmineRest::Base;
-extends 'Net::RedmineRest::Base';
+use Net::Redmine::Base;
+extends 'Net::Redmine::Base';
 
 has connection => (
     is => "rw",
@@ -35,7 +35,7 @@ sub results {
             sub {
                 my $issue_url = $_->getAttribute("href") or return;
                 if (my ($issue_id) = $issue_url =~ m[/issues/(\d+)$]) {
-                    push @r, Net::RedmineRest::Ticket->load(connection => $self->connection, id => $issue_id)
+                    push @r, Net::Redmine::Ticket->load(connection => $self->connection, id => $issue_id)
                 }
             }
         );
@@ -47,7 +47,7 @@ sub results {
 sub all_tickets {
     my ($self) = @_;
 
-    my $project=Net::RedmineRest::Project->load(
+    my $project=Net::Redmine::Project->load(
          connection=>$self->connection
     );
     return @{$project->issues} if ($project);
@@ -63,7 +63,7 @@ sub all_tickets {
     my $data = Text::CSV::Slurp->load(filehandle => $csv_io);
     my @r = ();
     foreach my $t (@$data) {
-        push @r, Net::RedmineRest::Ticket->load(connection => $self->connection, id => $t->{'#'});
+        push @r, Net::Redmine::Ticket->load(connection => $self->connection, id => $t->{'#'});
     }
     return wantarray ? @r : \@r;
 }

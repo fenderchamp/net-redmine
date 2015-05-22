@@ -1,7 +1,7 @@
-package Net::RedmineRest::Simple;
+package Net::Redmine::Simple;
 use Moo;
-use Net::RedmineRest::Base;
-extends 'Net::RedmineRest::Base';
+use Net::Redmine::Base;
+extends 'Net::Redmine::Base';
 
 has name => ( is=>"rw" );
 has id => ( is=>"rw" );
@@ -39,7 +39,7 @@ __END__
 
 =head1 NAME
 
-Net::RedmineRest::Issue - Represents a issue.
+Net::Redmine::Issue - Represents a issue.
 
 =head1 SYNOPSIS
 

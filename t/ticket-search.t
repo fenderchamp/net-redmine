@@ -2,7 +2,7 @@
 use strict;
 use Quantum::Superpositions;
 use Test::Project;
-use Net::RedmineRest;
+use Net::Redmine;
 use Test::More;
 
 require 't/net_redmine_rest_test.pl';

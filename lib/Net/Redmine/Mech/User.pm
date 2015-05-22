@@ -4,7 +4,7 @@ use URI::Escape;
 
 has connection => (
     is => "rw",
-    isa => "Net::RedmineRest::Connection",
+    isa => "Net::Redmine::Connection",
     required => 1,
     weak_ref => 1,
 );

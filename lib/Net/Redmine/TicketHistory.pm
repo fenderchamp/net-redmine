@@ -1,9 +1,9 @@
-package Net::RedmineRest::TicketHistory;
+package Net::Redmine::TicketHistory;
 use Moo;
 use DateTime::Format::DateParse;
 
-use Net::RedmineRest::Issue;
-use Net::RedmineRest::User;
+use Net::Redmine::Issue;
+use Net::Redmine::User;
 use URI;
 
 has connection       => (is => "rw", required => 1);
@@ -55,7 +55,7 @@ sub _build_property_changes {
 
 sub _build_ticket {
     my ($self) = @_;
-    return Net::RedmineRest::Issue->load(id => $self->ticket_id, connection => $self->connection);
+    return Net::Redmine::Issue->load(id => $self->ticket_id, connection => $self->connection);
 }
 
 sub _build_ticket_id {
@@ -85,7 +85,7 @@ sub _build_date {
 
 sub _build_author {
     my ($self) = @_;
-    return Net::RedmineRest::User->load(id => $self->journal->{user}->{id},connection => $self->connection) if $self->journal->{user}->{id};
+    return Net::Redmine::User->load(id => $self->journal->{user}->{id},connection => $self->connection) if $self->journal->{user}->{id};
     return "";
 }
 
