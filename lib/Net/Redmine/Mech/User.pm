@@ -1,10 +1,10 @@
-package Net::Redmine::User;
+package Net::Redmine::Mech::User;
 use Any::Moose;
 use URI::Escape;
 
 has connection => (
     is => "rw",
-    isa => "Net::Redmine::Connection",
+    isa => "Net::RedmineRest::Connection",
     required => 1,
     weak_ref => 1,
 );
@@ -34,7 +34,7 @@ sub _build_email {
 
     if ($html =~ m[<li>Email: <script type="text/javascript">eval\(decodeURIComponent\('(.+?)'\)\)</script></li>]) {
         my $docwrite = uri_unescape($1);
-        my ($email) = $docwrite =~ m["mailto:(.+)">];
+        my ($email) = $docwrite =~ m["mailto:(.+)\\">];
         return $email;
     }
 }

@@ -8,18 +8,14 @@ has connection => (
     weak_ref => 1
 );
 
-has json        => (is => "rw");
+has json      => (is => "rw");
+has mech_self => ( is=>"rw");
 has response_code  => (is => "rw");
 has service => ( is=>"rw",lazy=>1,builder=>1);
 
 sub _build_service {
     my ($self) = @_;
     return $self->entity.'s';  #the project name
-}
-
-sub force_mechanize {
-    my ($self) = @_;
-    $self->connection->mech_login();
 }
 
 sub save {
@@ -65,7 +61,29 @@ sub create {
       $self->_refresh();
       return $self;
     }  
+    return $self->mech_create(%attr) if ( $self->can('mech_class_name') );
 }
+
+sub mech_load {
+   my ($self,%args)=@_;
+   my $class_name  = $self->mech_class_name();
+   my $class       = "Net::Redmine::Mech::${class_name}";
+   my $mech_object = $class->load(%args);
+   return undef unless ( $mech_object );
+   $self->mech_self($mech_object);
+   return $self->mech_self();
+}
+
+sub mech_create {
+   my ($self,%args)=@_;
+   my $class_name  = $self->mech_class_name();
+   my $class       = "Net::Redmine::Mech::${class_name}";
+   my $mech_object = $class->create(%args);
+   return undef unless ( $mech_object );
+   $self->mech_self($mech_object);
+   return $self->mech_self();
+}
+
 
 sub load_from_json {
     my ($class, %attr) = @_;
@@ -82,19 +100,22 @@ sub load {
     if ( $class->can('has_required_load_args')) { 
       $args=$class->has_required_load_args(%attr);
     }
-
     if ( $class->can('fetch_cache') ) {
-        my $o=$class->fetch_cache(%attr); 
+       my $o=$class->fetch_cache(%attr); 
 	     return $o if ( $o );
     }	
 
     my $self = $class->new(%attr);
-    return $self->_process_response($self->_get(%$args));
+    return $self if ( $self->_process_response($self->_get(%$args)) );
+    return undef if ( $self->connection->rest_works );
+
+    return $self->mech_load(%attr) if ( $self->can('mech_class_name') );
+
 }
 
 sub refresh {
     my ($self)=@_;
-    $self->_reload();
+    $self->_reload;
 }
 
 sub _reload {
@@ -114,7 +135,7 @@ sub _process_response {
     if ( $code == 200 ) {
       $self->json($content->{$self->entity});
       $self->_refresh();
-      return $self;
+      return 1;
     }
     return undef;
 }
@@ -145,7 +166,9 @@ sub destroy {
     if ( $code == 200 ) {
       $self->clean_cache() if ($self->can('clean_cache') );
     } 
+    return $self->mech_self->destroy() if ( $self->can('mech_self') && $self->mech_self );
 }
+
 
 sub _service_url {
     my ($self,%args)=@_;

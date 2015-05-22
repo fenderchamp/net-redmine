@@ -34,6 +34,7 @@ has status               => (is => "rw");
 
 has json => (is => "rw");
 
+sub  mech_class_name {  return 'User' };
 
 sub email {
    my ($self)=@_;

@@ -3,6 +3,7 @@ use Moo;
 use Net::RedmineRest::Project;
 use Net::RedmineRest::Simple;
 use Net::RedmineRest::TicketHistory;
+use Net::Redmine::Mech::Ticket;
 use Net::RedmineRest::User;
 
 use DateTimeX::Easy;
@@ -13,6 +14,10 @@ extends 'Net::RedmineRest::Base';
 my $ENTITY = 'issue';
 
 has entity => ( is => "rw", default => ${ENTITY} );
+
+sub mech_class_name {
+   return 'Ticket';
+}
 
 has additional_get_params => (
     is      => "rw",

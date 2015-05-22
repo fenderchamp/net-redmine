@@ -9,9 +9,11 @@ has user     => ( is => "rw",  required => 1 );
 has password => ( is => "rw",  required => 0 );
 has apikey   => ( is => "rw",  required => 0 );
 
-has is_logined => ( is => "rw");
-has is_rest    => ( is => "rw");
-has is_mech    => ( is => "rw");
+has is_logined  => ( is => "rw");
+has is_rest     => ( is => "rw");
+has rest_failed => ( is => "rw");
+has rest_tested => ( is => "rw");
+has is_mech     => ( is => "rw");
 
 has base_url => ( is => "rw", lazy => 1, builder => 1);
 has issue_statuses => ( is => "rw", lazy =>1, builder =>1);
@@ -62,7 +64,12 @@ sub POST {
    $rest->POST($url,$data,$headers);
 
    my ($code,$content)=($rest->responseCode, $rest->responseContent);
-   $content=decode_json $content if ( $code == 201 && $content );
+   $self->rest_tested(1);
+   if ( $code == 201 && $content ) {
+      $content=decode_json $content; 
+   } else {
+      $self->test_rest_connection() unless ($self->rest_failed ); 
+   }
    return ($code,$content);
 }
 
@@ -73,7 +80,12 @@ sub PUT {
    $rest->PUT($url,$data,$headers);
 
    my ($code,$content)=($rest->responseCode, $rest->responseContent);
-   $content=decode_json $content if ( $code == 200 && $content );
+   $self->rest_tested(1);
+   if ( $code == 200 && $content ) {
+      $content=decode_json $content;
+   } {
+      $self->test_rest_connection() unless ($self->rest_failed ); 
+   }
    return ($code,$content);
 }
 
@@ -99,18 +111,36 @@ sub _submit_id_only {
    $rest->$action($url.${delim}.'key=' . $apikey);
 
    my ($code,$content)=($rest->responseCode, $rest->responseContent);
-   $content=decode_json $content if ( $code == 200 && $content );
+   if ( $code == 200 && $content ) {
+      $content=decode_json $content;
+   } else {
+      $self->test_rest_connection() unless ($self->rest_tested ); 
+   }
    return ($code,$content);
 }
 
-sub working_rest_connection {
+sub rest_works {
+
    my ( $self,%args ) = @_;
+   $self->test_rest_connection unless ( $self->rest_tested );
+   if ( $self->rest_tested ) {
+      return 1 unless ( $self->rest_failed() ) 
+   }
+   return 0; 
+}
+
+sub test_rest_connection {
+   my ( $self,%args ) = @_;
+   return if ( $self->rest_tested() );
+   $self->rest_tested(1);
    my ( $code,$content) = $self->projects_list();
    if ( $code && $code == 200 ) {
-       return 1;
+      return 1;
+   } else {
+      $self->rest_failed(1);
    }
-
 }
+
 sub projects_list {
    my ( $self,%args ) = @_;
    my ( $code,$content) = $self->GET($self->base_url . '/projects.json' );
@@ -166,21 +196,24 @@ sub get_login_page {
 }
 
 
-sub assert_login {
+sub __assert_login {
     my ($self) = @_;
+    return $self->mech_login();
     return 1 if ( $self->is_logined && $self->is_rest );
     if ( $self->working_rest_connection ) {
             $self->is_rest(1);
-            $self->is_logined(1);
             return 1; 
     }
-    return $self->mech_login()
+    #return $self->mech_login()
 }
 
-sub mech_login {
+sub assert_login {
 
     my ($self) = @_;
-    return 1 if ( $self->is_logined && $self->is_mech() );
+   # unless ( $args{force} ) {
+    #   return undef if ( $self->is_rest() );
+    # }  
+    return 1 if ( $self->is_logined );
     my $mech = $self->get_login_page->mechanize;
     my $form_n = 0;
     my @forms = $mech->forms;
@@ -206,7 +239,6 @@ sub mech_login {
     if ( $d_c =~ /<div class="flash error"/ ) {
         die "Can't login, invalid login or password !";
     }
-    $self->is_mech(1);
     $self->is_logined(1);
     return 1;
 
@@ -242,12 +274,8 @@ sub get_issues_page {
 sub get_new_issue_page {
     my ($self) = @_;
 
-
     my $mech = $self->get_project_overview->mechanize;
-
-    my $uri = URI->new($self->url);
-    $uri->path('/issues/new');
-    $self->mechanize->get( $uri->as_string );
+    $mech->follow_link( url_regex => qr[/issues/new$] );
 
     die "Failed to get the 'New Issue' page\n" unless $mech->response->is_success;
 

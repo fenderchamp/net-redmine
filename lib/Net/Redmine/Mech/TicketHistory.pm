@@ -1,30 +1,21 @@
-package Net::Redmine::TicketHistory;
-use Any::Moose;
+package Net::Redmine::Mech::TicketHistory;
+use Moo;
 use DateTime::Format::DateParse;
-use Net::Redmine::Ticket;
-use Net::Redmine::User;
+use Net::Redmine::Mech::Ticket;
+use Net::Redmine::Mech::User;
 use URI;
 
-has connection => (
-    is => "rw",
-    isa => "Net::Redmine::Connection",
-    required => 1
-);
+has connection       => (is => "rw");
+has id               => (is => "rw", required => 1);
+has ticket_id        => (is => "rw", , required=> 1);
+has date             => (is => "rw", , lazy=>1, builder => 1);
+has note             => (is => "rw", , lazy=>1, builder => 1);
+has property_changes => (is => "rw", , lazy=>1, builder => 1);
+has author           => (is => "ro", , lazy=>1, builder => 1);
 
-has id               => (is => "rw", isa => "Int", required => 1);
-has ticket_id        => (is => "rw", isa => "Int", required => 1);
-has date             => (is => "rw", isa => "DateTime", lazy_build => 1);
-has note             => (is => "rw", isa => "Str", lazy_build => 1);
-has property_changes => (is => "rw", isa => "HashRef", lazy_build => 1);
-has author           => (is => "ro", isa => "Maybe[Net::Redmine::User]", lazy_build => 1);
+has _ticket_page_html => (is => "rw", lazy => 1, builder => 1);
+has ticket => (is => "rw", lazy => 1, builder => 1);
 
-has _ticket_page_html => (is => "rw", isa => "Str", lazy_build => 1);
-
-has ticket => (
-    is => "ro",
-    isa => "Net::Redmine::Ticket",
-    lazy_build => 1
-);
 
 use pQuery;
 
@@ -83,7 +74,7 @@ sub _build_property_changes {
 
 sub _build_ticket {
     my ($self) = @_;
-    return Net::Redmine::Ticket->load(id => $self->ticket_id, connection => $self->connection);
+    return Net::Redmine::Mech::Ticket->load(id => $self->ticket_id, connection => $self->connection);
 }
 
 use HTML::WikiConverter;
@@ -122,12 +113,11 @@ sub _build_date {
 sub _build_author {
     my $self = shift;
     my $p = pQuery($self->_ticket_page_html);
-    my $user_uri = URI->new($p->find(".journal")->eq($self->id - 1)->find("a")->get(2)->getAttribute("href"));
-    if ($user_uri->path =~ m{/account/show/(\d+)$}) {
-        return Net::Redmine::User->load(id => $1, connection => $self->connection);
+    my $user_uri = URI->new($p->find(".journal")->eq($self->id - 1)->find("a")->get(1)->getAttribute("href"));
+    if ($user_uri->path =~ m{/users/(\d+)$}) {
+        return Net::Redmine::Mech::User->load(id => $1, connection => $self->connection);
     }
 }
 
 __PACKAGE__->meta->make_immutable;
-no Any::Moose;
 1;

@@ -21,8 +21,6 @@ sub results {
     unless (defined($self->query)) {
         return $self->all_tickets;
     }
-    $self->force_mechanize();
-
     my $mech = $self->connection->get_project_overview->mechanize;
     $mech->form_number(1);
     $mech->field(q => $self->query);
@@ -54,7 +52,6 @@ sub all_tickets {
     );
     return @{$project->issues} if ($project);
 
-    $self->force_mechanize();
     my $mech = $self->connection->get_issues_page->mechanize;
 
     unless ($mech->follow_link(text => "CSV")) {
@@ -68,7 +65,6 @@ sub all_tickets {
     foreach my $t (@$data) {
         push @r, Net::RedmineRest::Ticket->load(connection => $self->connection, id => $t->{'#'});
     }
-
     return wantarray ? @r : \@r;
 }
 

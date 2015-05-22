@@ -12,8 +12,8 @@ sub net_redmine_test {
 }
 
 sub new_net_redmine {
-    my ($server, $user, $password) = ("http://demo.redmine.org", "net-redmine-unit-tests", "net-redmine-unit-tests");
-    return Net::Redmine->new(url => $server,user => $user, password => $password);
+    my ($server, $user, $password) = ("http://netredmine.m.redmine.org", "net-redmine-unit-tests", "net-redmine-unit-tests");
+    return Net::RedmineRest->new(url => $server.'/projects/test',user => $user, password => $password);
 }
 
 use Text::Greeking;

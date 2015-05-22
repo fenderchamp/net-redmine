@@ -1,12 +1,12 @@
-package Net::Redmine::Ticket;
+package Net::Redmine::Mech::Ticket;
 use Any::Moose;
-use Net::Redmine::TicketHistory;
-use Net::Redmine::User;
+use Net::Redmine::Mech::TicketHistory;
+use Net::Redmine::Mech::User;
 use DateTimeX::Easy;
 
 has connection => (
     is => "rw",
-    isa => "Net::Redmine::Connection",
+    isa => "Net::RedmineRest::Connection",
     required => 1,
     weak_ref => 1,
 );
@@ -16,7 +16,7 @@ has subject     => (is => "rw", isa => "Str");
 has description => (is => "rw", isa => "Str");
 has status      => (is => "rw", isa => "Str");
 has priority    => (is => "rw", isa => "Str");
-has author      => (is => "rw", isa => "Maybe[Net::Redmine::User]");
+has author      => (is => "rw", isa => "Maybe[Net::Redmine::Mech::User]");
 has created_at  => (is => "rw", isa => "DateTime");
 has note        => (is => "rw", isa => "Str");
 has histories   => (is => "rw", isa => "ArrayRef", lazy_build => 1);
@@ -86,7 +86,7 @@ sub refresh {
 
     my $author_page_uri = $p->find(".issue .author a")->get(0)->getAttribute("href");
     if ($author_page_uri =~ m[/(?:account/show|users)/(\d+)$]) {
-        $self->author(Net::Redmine::User->load(id => $1, connection => $self->connection));
+        $self->author(Net::Redmine::Mech::User->load(id => $1, connection => $self->connection));
     }
 
     return $self;
@@ -107,7 +107,7 @@ sub save {
     );
 
     if ($self->note) {
-        $mech->set_fields(notes => $self->note);
+        $mech->set_fields('issue[notes]' => $self->note);
     }
 
     $mech->submit;
@@ -127,12 +127,27 @@ sub destroy {
 
     my $mech = $self->connection->mechanize;
     my $link = $mech->find_link(url_regex => qr[/issues/${id}/destroy$]);
+    $link = $mech->find_link(text=>'Delete',url_regex=>qr[/issues/${id}]) unless ( $link );
 
     die "You cannot delete the ticket $id.\n" unless $link;
 
     my $html = $mech->content;
-    my $delete_form = "<form name='net_redmine_delete_issue' method=\"POST\" action=\"@{[ $link->url_abs ]}\"><input type='hidden' name='_method' value='post'></form>";
-    $html =~ s/<body>/<body>${delete_form}/;
+    my $p = pQuery($html);
+    my $auth_input;
+    my $n = $p->find('#new-relation-form input')->each(sub {
+      if ( $_->getAttribute("name") && $_->getAttribute("name") eq 'authenticity_token' ) {
+         $auth_input=$_->toHTML();
+      }
+    });
+    my $delete_form = "<form name='net_redmine_delete_issue' method=\"POST\" action=\"@{[ $link->url_abs ]}\">
+      <input type='hidden' name='_method' value='delete'>".${auth_input}."</form>";
+   if ( my ($opening_body_tag)=($html=~m/(<body.*?\>)/) ) {
+       my $tmp=${opening_body_tag}.${delete_form};
+       $html =~ s/$opening_body_tag/${tmp}/;
+   } else {
+       die "cannot sub in new html to delete ticket $id";
+   }
+
     $mech->update_html($html);
 
     $mech->form_number(1);
@@ -159,7 +174,7 @@ sub _build_histories {
 
     return [
         map {
-            Net::Redmine::TicketHistory->new(
+            Net::Redmine::Mech::TicketHistory->new(
                 connection => $self->connection,
                 id => $_,
                 ticket_id => $self->id
