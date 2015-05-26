@@ -28,6 +28,4 @@ my $t2 = $r->lookup(
 
 memory_cycle_ok($r);
 memory_cycle_ok($t2);
-
-$DB::single=1;
 $t1->destroy;

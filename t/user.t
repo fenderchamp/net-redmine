@@ -52,7 +52,6 @@ is($new_user->login, $loaded_user->login, 'match login');
 is($new_user->mail, $loaded_user->mail, 'match mail');
 is($new_user->id, $loaded_user->id,'match id');
 
-$DB::single=1;
 $loaded_user->destroy();
 undef($loaded_user);
 
