@@ -1,25 +1,24 @@
 package Net::Redmine::Mech::Ticket;
-use Any::Moose;
+use Moo;
 use Net::Redmine::Mech::TicketHistory;
 use Net::Redmine::Mech::User;
 use DateTimeX::Easy;
 
 has connection => (
     is => "rw",
-    isa => "Net::Redmine::Connection",
     required => 1,
     weak_ref => 1,
 );
 
-has id          => (is => "rw", isa => "Int");
-has subject     => (is => "rw", isa => "Str");
-has description => (is => "rw", isa => "Str");
-has status      => (is => "rw", isa => "Str");
-has priority    => (is => "rw", isa => "Str");
-has author      => (is => "rw", isa => "Maybe[Net::Redmine::Mech::User]");
-has created_at  => (is => "rw", isa => "DateTime");
-has note        => (is => "rw", isa => "Str");
-has histories   => (is => "rw", isa => "ArrayRef", lazy_build => 1);
+has id          => (is => "rw");
+has subject     => (is => "rw");
+has description => (is => "rw");
+has status      => (is => "rw");
+has priority    => (is => "rw");
+has author      => (is => "rw");
+has created_at  => (is => "rw");
+has note        => (is => "rw");
+has histories   => (is => "rw", lazy=>1, builder => 1);
 
 sub create {
     my ($class, %attr) = @_;
@@ -184,7 +183,6 @@ sub _build_histories {
 }
 
 __PACKAGE__->meta->make_immutable;
-no Any::Moose;
 1;
 
 __END__

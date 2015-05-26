@@ -1,5 +1,5 @@
 package Net::Redmine::Mech::Search;
-use Any::Moose;
+use Moo;
 use pQuery;
 use Net::Redmine::Ticket;
 use Text::CSV::Slurp;
@@ -7,12 +7,11 @@ use IO::String;
 
 has connection => (
     is => "rw",
-    isa => "Net::Redmine::Connection",
     required => 0
 );
 
-has query => (is => "rw", isa => "Maybe[Str]", required => 1);
-has type => (is => "rw", isa => "ArrayRef", required => 1);
+has query => (is => "rw", required => 1);
+has type => (is => "rw",  required => 1);
 
 sub results {
     my $self = shift;
@@ -64,5 +63,4 @@ sub all_tickets {
 }
 
 __PACKAGE__->meta->make_immutable;
-no Any::Moose;
 1;

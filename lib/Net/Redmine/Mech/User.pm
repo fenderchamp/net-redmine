@@ -1,30 +1,29 @@
 package Net::Redmine::Mech::User;
-use Any::Moose;
+use Moo;
 use URI::Escape;
 
 has connection => (
     is => "rw",
-    isa => "Net::Redmine::Connection",
     required => 1,
     weak_ref => 1,
 );
 
 has id => (
     is => "rw",
-    isa => "Num",
     required => 1
 );
 
 has email => (
     is => "rw",
-    isa => "Str",
-    lazy_build => 1,
+    lazy => 1,
+    builder => 1,
 );
 
 has page_html => (
     is => "rw",
-    isa => "Str",
-    lazy_build => 1,
+    lazy => 1,
+    builder => 1,
+    clearer => 1
 );
 
 sub _build_email {
@@ -64,5 +63,4 @@ sub refresh {
 
 
 __PACKAGE__->meta->make_immutable;
-no Any::Moose;
 1;
