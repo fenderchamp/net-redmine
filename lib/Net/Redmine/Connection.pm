@@ -195,18 +195,6 @@ sub get_login_page {
     return $self;
 }
 
-
-sub __assert_login {
-    my ($self) = @_;
-    return $self->mech_login();
-    return 1 if ( $self->is_logined && $self->is_rest );
-    if ( $self->working_rest_connection ) {
-            $self->is_rest(1);
-            return 1; 
-    }
-    #return $self->mech_login()
-}
-
 sub assert_login {
 
     my ($self) = @_;
