@@ -1,4 +1,4 @@
-use inc::Module::Install:AuthorTests;
+use inc::Module::Install;
 name 'Net-Redmine';
 all_from 'lib/Net/Redmine.pm';
 
