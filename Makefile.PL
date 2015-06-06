@@ -16,7 +16,7 @@ requires
     "Params::Validate"              => "0.91",
     "pQuery"                        => "0.07";
     "Regexp::Common"                => "2.122",
-    "Regexp::Common::Email::Address"=> "1.01",
+    "Regexp::Common::Email::Address" => "1.01",
     "REST::Client"                  => "272",
     "Text::CSV::Slurp"              => "0.5",
     "URI"                           => "1.38",
