@@ -1,3 +1,7 @@
+0.10:
+  - added rest calls
+  - fixed some form parsing 
+
 0.09:
   - load the authors of ticket histories
   - fix assert_login for login pages without a search form.
