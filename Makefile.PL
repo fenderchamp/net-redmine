@@ -20,7 +20,7 @@ requires
     "Text::CSV::Slurp"              => "0.5",
     "URI"                           => "1.38",
     "URI::Escape"                   => "3.29",
-    "WWW::Mechanize"                => "1.52",
+    "WWW::Mechanize"                => "1.52"
 
 build_requires
     "Test::Cukes"             => "0.06",
