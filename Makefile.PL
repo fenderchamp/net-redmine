@@ -3,13 +3,13 @@ name 'Net-Redmine';
 all_from 'lib/Net/Redmine.pm';
 
 requires
-    #"REST::Client"                  => "1",
-    #"DateTime::Format::DateParse"   => "0.04",
-    #"DateTimeX::Easy"               => "0.086",
-    "Encode"                        => "2.31",
-    #"HTML::WikiConverter"           => "0.68",
-    #"HTML::WikiConverter::Markdown" => "0.05",
-    #"JSON"                          => "2.90",
+    "REST::Client"                  => "1",
+    "DateTime::Format::DateParse"   => "0.04",
+    "DateTimeX::Easy"               => "0.086",
+    #"Encode"                        => "2.31",
+    "HTML::WikiConverter"           => "0.68",
+    "HTML::WikiConverter::Markdown" => "0.05",
+    "JSON"                          => "2.90",
     #"IO::All"                       => "0.39",
     #"WWW::Mechanize"                => "1.52",
     #"IO::String"                    => "1.08",
