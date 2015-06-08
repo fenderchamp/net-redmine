@@ -14,10 +14,10 @@ requires
     "WWW::Mechanize"                => "1.52",
     "IO::String"                    => "1.08",
     "Moo"                           => "2.000001",
-    #"Params::Validate"              => "0.91",
-    #"pQuery"                        => "0.07";
-    #"Regexp::Common"                => "2.122",
-    #"Regexp::Common::Email::Address" => "1.01",
+    "Params::Validate"              => "0.91",
+    "pQuery"                        => "0.07";
+    "Regexp::Common"                => "2.122",
+    "Regexp::Common::Email::Address" => "1.01",
     #"Text::CSV::Slurp"              => "0.5",
     #"URI"                           => "1.38",
     #"URI::Escape"                   => "3.29",
