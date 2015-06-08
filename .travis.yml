@@ -4,5 +4,3 @@ branches:
     - rest
 before_install:
     - cpanm Module::Install::AuthorTests;
-install:
-    - cpanm -v --installdeps --notest .
