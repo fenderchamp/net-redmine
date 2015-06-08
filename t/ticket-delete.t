@@ -1,6 +1,8 @@
 #!/usr/bin/env perl -w
 use strict;
 use Net::Redmine;
+
+use lib 't/lib';
 use Test::Project;
 
 require 't/net_redmine_rest_test.pl';

@@ -1,12 +1,14 @@
 #!/usr/bin/env perl -w
 use strict;
 use Net::Redmine;
-use Test::Project;
 use Net::Redmine::Project;
 use Net::Redmine::IssueList;
 use Test::More;
 
 require 't/net_redmine_rest_test.pl';
+
+use lib 't/lib';
+use Test::Project;
 
 my $r = new_net_redmine();
 

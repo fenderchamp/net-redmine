@@ -1,11 +1,12 @@
 #!/usr/bin/env perl -w
 use strict;
-use Test::Project;
 use Quantum::Superpositions;
 use Net::Redmine;
 use Net::Redmine::Search;
 use Test::Cukes;
 
+use lib 't/lib';
+use Test::Project;
 require 't/net_redmine_rest_test.pl';
 
 my $search;

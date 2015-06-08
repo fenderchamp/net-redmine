@@ -1,6 +1,8 @@
 #!/usr/bin/env perl -w
 use strict;
 use Net::Redmine;
+
+use lib 't/lib';
 use Test::Project;
 
 use Test::Memory::Cycle;

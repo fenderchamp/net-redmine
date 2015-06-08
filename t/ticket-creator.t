@@ -4,7 +4,11 @@ use strict;
 use Test::Cukes;
 use Regexp::Common;
 use Regexp::Common::Email::Address;
+
+
+use lib 't/lib';
 use Test::Project;
+
 use Test::More;
 
 require 't/net_redmine_rest_test.pl';

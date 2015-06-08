@@ -2,10 +2,12 @@
 
 use strict;
 
-use Test::Project;
 use Net::Redmine;
 use Net::Redmine::Ticket;
 use Test::More;
+
+use lib 't/lib';
+use Test::Project;
 
 require 't/net_redmine_rest_test.pl';
 my ( $identifier, $name, $description, $homepage ) = project_test_data();

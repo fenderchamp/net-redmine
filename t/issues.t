@@ -4,9 +4,11 @@ use Net::Redmine;
 use Net::Redmine::Issue;
 use Net::Redmine::Simple;
 use DateTime;
-use Test::Project;
+
 use Test::More;
 
+use lib 't/lib';
+use Test::Project;
 require 't/net_redmine_rest_test.pl';
 
 my $r = new_net_redmine();

@@ -1,10 +1,11 @@
 #!/usr/bin/env perl -w
 use strict;
 use Net::Redmine::Ticket;
-use Test::Project;
 use Test::More;
 use DateTime;
 
+use lib 't/lib';
+use Test::Project;
 require 't/net_redmine_rest_test.pl';
 
 my $r = new_net_redmine();
