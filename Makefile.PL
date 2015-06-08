@@ -23,11 +23,11 @@ requires
     #"URI::Escape"                   => "3.29",
 
 build_requires
-    "Test::Cukes"             => "0.06",
-    "Test::Memory::Cycle"     => "1.04",
-    "Text::Greeking"          => "0.11",
-    "Quantum::Superpositions" => "1.03",
-    "Test::More"              => "0.86";
+    #"Test::Cukes"             => "0.06",
+    #"Test::Memory::Cycle"     => "1.04",
+    #"Text::Greeking"          => "0.11",
+    #"Quantum::Superpositions" => "1.03",
+    #"Test::More"              => "0.86";
 
 repository 'http://github.com/gugod/net-redmine';
 
