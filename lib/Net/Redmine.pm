@@ -57,7 +57,10 @@ sub create {
 
 sub copy {
     my ( $self, %args ) = @_;
-    my $orig = $self->lookup_ticket(%$_) if $_ = $args{ticket};
+
+    my $orig;
+    $orig = $self->lookup_ticket(%$_) if $_ = $args{ticket};
+
     delete $args{ticket}{id};
     my @list = $orig->meta->get_attribute_list;
     foreach my $attr (@list) {

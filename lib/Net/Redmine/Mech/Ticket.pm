@@ -68,7 +68,7 @@ sub refresh {
     die "Cannot lookup ticket histories without id.\n" unless $self->id;
 
     my $id = $self->id;
-    eval '$self->connection->get_issues_page($id)';
+    eval { $self->connection->get_issues_page($id) };
     if ($@) { warn $@; return }
 
     my $p = pQuery($self->connection->mechanize->content);
