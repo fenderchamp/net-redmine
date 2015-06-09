@@ -13,13 +13,13 @@ sub _process_response {
       $self->projects($content->{projects});
       return $self;
     }
-    return undef;
+    return;
 }
 
 #noops
-sub save    { return undef };
-sub create  { return undef };
-sub destroy { return undef };
+sub save    { return };
+sub create  { return };
+sub destroy { return };
 
 __PACKAGE__->meta->make_immutable;
 1;

@@ -69,7 +69,7 @@ sub mech_load {
    my $class_name  = $self->mech_class_name();
    my $class       = "Net::Redmine::Mech::${class_name}";
    my $mech_object = $class->load(%args);
-   return undef unless ( $mech_object );
+   return unless ( $mech_object );
    $self->mech_self($mech_object);
    return $self->mech_self();
 }
@@ -79,7 +79,7 @@ sub mech_create {
    my $class_name  = $self->mech_class_name();
    my $class       = "Net::Redmine::Mech::${class_name}";
    my $mech_object = $class->create(%args);
-   return undef unless ( $mech_object );
+   return unless ( $mech_object );
    $self->mech_self($mech_object);
    return $self->mech_self();
 }
@@ -87,7 +87,7 @@ sub mech_create {
 
 sub load_from_json {
     my ($class, %attr) = @_;
-    return undef unless ($attr{json} && $attr{connection} ); 
+    return unless ($attr{json} && $attr{connection} ); 
     my $self = $class->new(%attr);
     $self->refresh_from_json;
     return $self;
@@ -107,7 +107,7 @@ sub load {
 
     my $self = $class->new(%attr);
     return $self if ( $self->_process_response($self->_get(%$args)) );
-    return undef if ( $self->connection->rest_works );
+    return if ( $self->connection->rest_works );
 
     return $self->mech_load(%attr) if ( $self->can('mech_class_name') );
 
@@ -137,7 +137,7 @@ sub _process_response {
       $self->_refresh();
       return 1;
     }
-    return undef;
+    return;
 }
 
 sub _get { 

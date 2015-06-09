@@ -30,7 +30,7 @@ sub _process_response {
         $self->_load_xref();
         return $self;
     }
-    return undef;
+    return;
 }
 
 sub fetch {
@@ -72,9 +72,9 @@ sub _load_xref {
 }
 
 #noops
-sub save    { return undef }
-sub create  { return undef }
-sub destroy { return undef }
+sub save    { return }
+sub create  { return }
+sub destroy { return }
 
 __PACKAGE__->meta->make_immutable;
 1;

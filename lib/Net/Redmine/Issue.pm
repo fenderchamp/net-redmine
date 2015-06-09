@@ -89,19 +89,19 @@ sub cache {
 sub fetch_cache {
     my ( $self, %args ) = @_;
     my $id = $args{id};
-    return undef unless $id;
+    return unless $id;
     my $connection = $args{connection};
-    return undef unless $connection;
+    return unless $connection;
 
     my $live = $connection->live_ticket_objects;
-    return undef unless $live;
+    return unless $live;
     return $live->{$id};
 }
 
 sub clean_cache {
     my ($self) = @_;
     my $live = $self->connection->live_ticket_objects;
-    return undef unless $live;
+    return unless $live;
     delete $live->{ $self->id };
 }
 

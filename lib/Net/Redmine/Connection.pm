@@ -198,9 +198,6 @@ sub get_login_page {
 sub assert_login {
 
     my ($self) = @_;
-   # unless ( $args{force} ) {
-    #   return undef if ( $self->is_rest() );
-    # }  
     return 1 if ( $self->is_logined );
     my $mech = $self->get_login_page->mechanize;
     my $form_n = 0;
