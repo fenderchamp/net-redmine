@@ -9,30 +9,20 @@ use Test::More;
 
 use lib 't/lib';
 use Test::Project;
-require 't/net_redmine_rest_test.pl';
 
-my $r = new_net_redmine();
-
-my ( $identifier, $name, $description, $homepage ) = project_test_data();
-
-my $t = Test::Project->new(
-    r           => $r,
-    identifier  => $identifier,
-    name        => $name,
-    description => $description,
-    homepage    => $homepage
-);
+my $t = Test::Project->new(initialize=>1);
+my $r = $t->r;
 
 $t->scrub_project_if_exists();
-my $p=$t->create_project_and_verify_its_there();
 
+my $p=$t->create_project_and_verify_its_there();
 my $subject = "Testing Net::Redmine $$ " . time;
 
 my $issue = Net::Redmine::Issue->create(
     connection => $r->connection,
     project => $p,
     subject => $subject,
-    description => "issue $description",
+    description => "issue $p->description",
     tracker =>
       Net::Redmine::Simple->new(
          name=>'bug', 

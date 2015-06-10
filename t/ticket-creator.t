@@ -5,13 +5,10 @@ use Test::Cukes;
 use Regexp::Common;
 use Regexp::Common::Email::Address;
 
-
 use lib 't/lib';
 use Test::Project;
 
 use Test::More;
-
-require 't/net_redmine_rest_test.pl';
 
 my $ticket_id;
 my $test_project;
@@ -19,18 +16,9 @@ my $ticket_two;
 
 Given qr/a ticket created by the current user/ => sub {
 
-    my ( $identifier, $name, $description, $homepage ) = project_test_data();
+    $test_project = Test::Project->new(initialize  => 1);
 
-    $test_project = Test::Project->new(
-        r           => new_net_redmine(),
-        identifier  => $identifier,
-        name        => $name,
-        description => $description,
-        homepage    => $homepage,
-        initialize  => 1
-    );
-
-    my ($ticket) = new_tickets($test_project->r, 1);
+    my ($ticket) = $test_project->new_tickets(1);
     $ticket_id = $ticket->id;
 
     assert $ticket_id =~ /^\d+$/;

@@ -9,24 +9,17 @@ use Test::More;
 use lib 't/lib';
 use Test::Project;
 
-require 't/net_redmine_rest_test.pl';
-my ( $identifier, $name, $description, $homepage ) = project_test_data();
 my $test_project = Test::Project->new(
-    r           => new_net_redmine(),
-    identifier  => $identifier,
-    name        => $name,
-    description => $description,
-    homepage    => $homepage,
     initialize  => 1
 );
 
-my ($ticket) = new_tickets( $test_project->r, 1 );
+my ($ticket) = $test_project->new_tickets( 1 );
 my $id = $ticket->id;
 
-my $rr = new_net_redmine();
+my $test_project2 = Test::Project->new();
 
-  my $ticket2 =
-  Net::Redmine::Ticket->load( connection => $rr->connection, id => $id );
+my $ticket2 =
+  Net::Redmine::Ticket->load( connection => $test_project2->r->connection, id => $id );
 
 $ticket->description("bleh bleh bleh");
 $ticket->save;

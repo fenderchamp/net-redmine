@@ -5,10 +5,9 @@ use Test::More qw(no_plan);
 use Net::Redmine;
 use Net::Redmine::Project;
 use Moo;
+use Text::Greeking;
 
-has r           => ( is       => 'rw',
-);
-
+has r           => ( is => 'rw',lazy=>1,builder=>1);
 has identifier  => ( is => 'rw' );
 has name        => ( is => 'rw' );
 has description => ( is => 'rw' );
@@ -18,10 +17,20 @@ has id           => ( is =>'rw');
 
 sub BUILD {
     my $self = shift;
+
+    my ( $identifier, $name, $description, $homepage ) = $self->project_test_data;
+    $self->identifier($identifier);
+    $self->name($name);
+    $self->description($description);
+    $self->homepage($homepage);
+
     if ( $self->initialize ) {
       $self->data_initialize();
     }
 }
+
+
+
 sub scrub_project_if_exists {
 
     my ($self) = @_;
@@ -105,6 +114,61 @@ sub data_initialize {
    $self->id($p->id);
 
 }
+
+sub _build_r {
+
+   my ($self)=@_;
+   my ($server, $user, $password, $apikey);
+
+   $server    = $ENV{REDMINE_TEST_SERVER};  
+   $user      = $ENV{REDMINE_TEST_USER};  
+   $password  = $ENV{REDMINE_TEST_PASSWORD};  
+   $apikey    = $ENV{REDMINE_TEST_APIKEY};  
+
+   return Net::Redmine->new(url => $server,user => $user, password => $password, apikey => $apikey);
+
+}
+
+sub project_test_data {
+
+    my ($self,$u)=@_;
+    my $unique;
+    while ( !($unique) ) {
+      my $pid=$$;
+      my $r = int(rand()*100);
+      $unique="${pid}${r}";
+      last unless ( $u && $unique == $u );
+    };
+
+    my $identifier='test'. $unique;
+    my $name='testing' .$unique;
+    my $description='test'.$unique.' project';
+    my $homepage='http://www.test'.$unique.'testing'.$unique.'.nz';
+    return ($identifier, $name ,$description, $homepage);
+}
+
+
+sub new_tickets {
+    my ($self,$n) = @_;
+    my $r=$self->r;
+    $n ||= 1;
+    my $g = Text::Greeking->new;
+    $g->paragraphs(1,1);
+    $g->sentences(1,1);
+    $g->words(8,24);
+
+    my (undef, $filename, $line) = caller;
+
+    return map {
+        $r->create(
+            ticket => {
+                subject => "$filename, line $line " . $g->generate,
+                description => $g->generate
+            }
+        );
+    } (1..$n);
+}
+
 
 __PACKAGE__->meta->make_immutable;
 1;

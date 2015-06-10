@@ -7,29 +7,20 @@ use Test::Cukes;
 
 use lib 't/lib';
 use Test::Project;
-require 't/net_redmine_rest_test.pl';
+use Test::More;
 
 my $search;
 my @tickets;
 
-my $test_project;
-
-    my ( $identifier, $name, $description, $homepage ) = project_test_data();
-    $test_project = Test::Project->new(
-        r           => new_net_redmine(),
-        identifier  => $identifier,
-        name        => $name,
-        description => $description,
-        homepage    => $homepage,
+my $test_project = Test::Project->new(
         initialize  => 1
     );
 
 my $r=$test_project->r;
-#my $n = int(rand(10)) + 3;
 my $n = 2; 
 
 Given qr/^that there are $n tickets in the system$/, sub {
-    @tickets = new_tickets($r, $n);
+    @tickets = $test_project->new_tickets( $n);
 
     assert @tickets == $n;
 };
@@ -39,6 +30,7 @@ When qr/^searching with null query value$/, sub {
 };
 
 Then qr/^all tickets should be found\.$/, sub {
+
     my @found = $search->results;
     assert(@found >= $n);
 

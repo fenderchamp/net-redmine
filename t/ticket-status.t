@@ -13,7 +13,6 @@ my $r = new_net_redmine();
 my @tickets = new_tickets(2);
 
 
-
 TODO: {
     # XXX: this ticket is known to has status "Closed".
     my $id = 70;

@@ -8,24 +8,35 @@ END {
     # system "kill -9 $REDMINE_SERVER_PID" if $REDMINE_SERVER_PID
 }
 
-sub net_redmine_test {
-    return ("http://demo.redmin.org", "admin", "admin");
-}
-
 sub new_net_redmine {
 
-   #$my ($server, $user, $password, $apikey) = ("http://netredmine.m.redmine.org", "net-redmine-unit-tests-admin", "net-redmine-unit-tests","e366da4adfe8d242891c59cbd70a912d8d875d88");
-   my ($server, $user, $password, $apikey) = ("http://netredmine.m.redmine.org", "net-redmine-unit-tests", "net-redmine-unit-tests","7b7ae7e9f9aed7ffed823f55701bf745c119338c");
+   my ($server, $user, $password, $apikey);
+
+   $server    = $ENV{REDMINE_TEST_SERVER};  
+   $user      = $ENV{REDMINE_TEST_USER};  
+   $password  = $ENV{REDMINE_TEST_PASSWORD};  
+   $apikey    = $ENV{REDMINE_TEST_APIKEY};  
+
    return Net::Redmine->new(url => $server,user => $user, password => $password, apikey => $apikey);
 
 }
 
 sub project_test_data {
-    my $identifier='test'. $$;
-    my $name='testing' .$$;
-    my $description='test'.$$.' project';
-    my $homepage='http://www.test'.$$.'testing'.$$.'.nz';
-    return ($identifier, $name ,$description, $homepage) 
+
+    my $u=$_[1];
+    my $unique;
+    while ( !($unique) ) {
+      my $pid=$$;
+      my $r = int(rand()*100);
+      $unique="${pid}${r}";
+      last unless ( $u && $unique == $u );
+    };
+
+    my $identifier='test'. $unique;
+    my $name='testing' .$unique;
+    my $description='test'.$unique.' project';
+    my $homepage='http://www.test'.$unique.'testing'.$unique.'.nz';
+    return ($identifier, $name ,$description, $homepage);
 }
 
 use Text::Greeking;

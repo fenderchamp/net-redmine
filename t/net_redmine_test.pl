@@ -6,13 +6,14 @@ END {
     # system "kill -9 $REDMINE_SERVER_PID" if $REDMINE_SERVER_PID
 }
 
-sub net_redmine_test {
-    return ("http://demo.redmin.org", "admin", "admin");
-}
-
 sub new_net_redmine {
-    my ($server, $user, $password) = ("http://netredmine.m.redmine.org", "net-redmine-unit-tests", "net-redmine-unit-tests");
-    return Net::Redmine->new(url => $server.'/projects/test',user => $user, password => $password);
+   my ($server, $user, $password);
+
+   $server    = $ENV{REDMINE_TEST_SERVER};
+   $user      = $ENV{REDMINE_TEST_USER};
+   $password  = $ENV{REDMINE_TEST_PASSWORD};
+
+   return Net::Redmine->new(url => $server.'/projects/test',user => $user, password => $password);
 }
 
 use Text::Greeking;

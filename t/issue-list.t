@@ -5,28 +5,18 @@ use Net::Redmine::Project;
 use Net::Redmine::IssueList;
 use Test::More;
 
-require 't/net_redmine_rest_test.pl';
-
 use lib 't/lib';
 use Test::Project;
 
-my $r = new_net_redmine();
-
-my ( $identifier, $name, $description, $homepage ) = project_test_data();
-
 my $test_project = Test::Project->new(
-    r           => $r,
-    identifier  => $identifier,
-    name        => $name,
-    description => $description,
-    homepage    => $homepage,
     initialize  => 1
 );
+my $r = $test_project->r;
 
 my $project_id=$test_project->id;
 
 ### Prepare new tickets
-my @tix=new_tickets($r, 2);
+my @tix=$test_project->new_tickets(2);
 
 my $issue_list=Net::Redmine::IssueList->load( 
    connection=>$r->connection,
@@ -35,7 +25,8 @@ my $issue_list=Net::Redmine::IssueList->load(
 is($issue_list->count, 2, "2 tickets in list");
 
 undef $r;
-$r = new_net_redmine();
+my $tp = Test::Project->new();
+$r = $tp->r;
 
 my $project=Net::Redmine::Project->load(
    id=>$project_id,

@@ -7,24 +7,15 @@ use Regexp::Common;
 use Regexp::Common::Email::Address;
 use DateTime;
 
-
 use lib 't/lib';
 use Test::Project;
-require 't/net_redmine_rest_test.pl';
-
-my $r = new_net_redmine();
-
-my ( $identifier, $name, $description, $homepage ) = project_test_data();
+use Test::More;
 
 my $test_project = Test::Project->new(
-    r           => $r,
-    identifier  => $identifier,
-    name        => $name,
-    description => $description,
-    homepage    => $homepage,
     initialize  => 1
 );
 
+my $r=$test_project->r;
 ### Prepare a new ticket with multiple histories
 my $t = $r->create(
     ticket => {

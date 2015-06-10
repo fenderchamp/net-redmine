@@ -10,7 +10,6 @@ has password => ( is => "rw",  required => 0 );
 has apikey   => ( is => "rw",  required => 0 );
 
 has is_logined  => ( is => "rw");
-has is_rest     => ( is => "rw");
 has rest_failed => ( is => "rw");
 has rest_tested => ( is => "rw");
 has is_mech     => ( is => "rw");
@@ -101,6 +100,7 @@ sub GET {
 
 sub _submit_id_only {
    my ($self,$url,$action)=@_;
+
    $action='GET' unless ($action);
 
    die '$action:needs url' unless ( $url );
@@ -120,7 +120,6 @@ sub _submit_id_only {
 }
 
 sub rest_works {
-
    my ( $self,%args ) = @_;
    $self->test_rest_connection unless ( $self->rest_tested );
    if ( $self->rest_tested ) {

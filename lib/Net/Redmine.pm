@@ -53,6 +53,8 @@ sub reset_connection {
 sub create {
     my ($self, %args) = @_;
     return $self->create_ticket(%{$args{ticket}}) if $args{ticket};
+    return $self->create_project(%{$args{project}}) if $args{project};
+    return $self->create_project(%{$args{user}}) if $args{user};
 }
 
 sub copy {
@@ -135,7 +137,7 @@ __END__
 
 =head1 NAME
 
-Net::Redmine - A mechanized-based programming API against redmine server.
+Net::Redmine - A Rest/Mech based programming API against redmine server.
 
 =head1 SYNOPSIS
 
@@ -144,7 +146,8 @@ Net::Redmine - A mechanized-based programming API against redmine server.
   my $r = Net::Redmine->new(
       url => $server,
       user => $user,
-      password => $password
+      password => $password, #optional
+      api_key => $api_key    #optional
   );
 
   # Create a new ticket
@@ -173,7 +176,7 @@ Net::Redmine - A mechanized-based programming API against redmine server.
 
 =head1 DESCRIPTION
 
-Net::Redmine is an mechanized-based programming API against redmine server.
+Net::Redmine is a programming API against redmine server.
 
 =head1 METHODS
 
